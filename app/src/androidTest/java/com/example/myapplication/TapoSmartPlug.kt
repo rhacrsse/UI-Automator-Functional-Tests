@@ -103,4 +103,16 @@ class TapoSmartPlug (val device: UiDevice,
         pressBackButton()
         pressBackButton()
     }
+
+    fun execSeqInstrumentedTest() {
+
+        if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
+
+        val smartPlugState = openSmartPlug()
+
+        click(smartPlugState)
+
+        pressBackButton()
+        pressBackButton()
+    }
 }

@@ -618,4 +618,23 @@ class TapoSmartBulb (val device: UiDevice,
         pressBackButton()
         //pressHomeButton()
     }
+
+    fun execSeqInstrumentedTest() {
+
+        if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
+        val smartBulbState = openSmartBulb()
+
+        increaseBrightSlider(smartBulbState)
+        decreaseBrightSlider(smartBulbState)
+        increaseSaturation(smartBulbState)
+        decreaseSaturation(smartBulbState)
+        setPresetColor(smartBulbState)
+        editColor(smartBulbState)
+        enablePartyTheme(smartBulbState)
+        enableRelaxTheme(smartBulbState)
+        click(smartBulbState)
+
+        pressBackButton()
+        pressBackButton()
+    }
 }

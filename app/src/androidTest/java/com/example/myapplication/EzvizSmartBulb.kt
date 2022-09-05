@@ -311,4 +311,24 @@ class EzvizSmartBulb (val device: UiDevice,
 
         //pressHomeButton()
     }
+
+    fun execSeqInstrumentedTest() {
+
+        if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
+
+        if (device.findObject(UiSelector().text("Enjoying EZVIZ?")).exists()) {
+            // Closing Popup window
+            //device.findObject(UiSelector().text("Enjoying EZVIZ?")).click()
+            //device.findObject(UiSelector().resourceId("com.ezviz:id/tv_next_time")).click()
+            device.findObject(UiSelector().resourceId("com.ezviz:id/iv_close")).click()
+        }
+
+        if (!checkBulbStatus()) turnOn(); editBright()
+        openSmartBulb(); editColor(); pressBackButton()
+        openSmartBulb(); editSaturation(); pressBackButton()
+        openSmartBulb(); editModes(); pressBackButton()
+        click()
+
+        //pressHomeButton()
+    }
 }
