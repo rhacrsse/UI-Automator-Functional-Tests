@@ -69,7 +69,7 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun click(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName.to] [DEVICE: $smartObjType] [ACTION: Click button]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName.to] [DEVICE: $smartObjType] [ACTION: Click button]\n")
 
         when(checkBulbStatus()) {
             true  -> turnOff(btn)
@@ -78,7 +78,7 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun turnOn(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON bulb]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON bulb]\n")
 
         btn.click()
         smartObjState = SmartObjStates.STATE_ON
@@ -86,7 +86,7 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun turnOff(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF bulb]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF bulb]\n")
 
         btn.click()
         smartObjState = SmartObjStates.STATE_OFF
@@ -94,7 +94,7 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun increaseBrightSlider(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Increase brightness]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Increase brightness]\n")
 
         if (!checkBulbStatus()) turnOn(btn)
         val smartBulbBrightness =
@@ -107,7 +107,7 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun decreaseBrightSlider(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Decrease brightness]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Decrease brightness]\n")
 
         if (!checkBulbStatus()) turnOn(btn)
         val smartBulbBrightness =
@@ -258,7 +258,7 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun increaseSaturation(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Increase saturation]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Increase saturation]\n")
 
         if (!checkBulbStatus()) turnOn(btn)
 
@@ -303,7 +303,7 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun decreaseSaturation(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Decrease saturation]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Decrease saturation]\n")
 
         if (!checkBulbStatus()) turnOn(btn)
         val smartBulbPresetColors = device.findObject(
@@ -393,7 +393,9 @@ class TapoSmartBulb (val device: UiDevice,
         */
 
         var prevRandomNumber = 10
-        for (i in 1..10) {
+        // il numbero di step da eseguire e' scelto in modo casuale tra 1 e 10
+        val maxStep = SecureRandom().nextInt(10).plus(1)
+        for (i in 1..maxStep step 1) {
             var randomNumber = SecureRandom().nextInt(9).plus(1)
 
             // il nuovo valore casuale deve essere diverso dal precedente
@@ -419,7 +421,7 @@ class TapoSmartBulb (val device: UiDevice,
                     else -> "error"
                 }
 
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Set preset color $presetColor]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Set preset color $presetColor]\n")
 
             val idx = when(randomNumber) {
                 1,2 -> 0
@@ -436,7 +438,6 @@ class TapoSmartBulb (val device: UiDevice,
                         UiSelector().resourceId(
                             SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_AUTO_COMPENSATE_MODE.rid))
                         .clickAndWaitForNewWindow()
-                    //turnOn(btn)
                 }
                 // auto-match
                 2 -> {
@@ -446,7 +447,7 @@ class TapoSmartBulb (val device: UiDevice,
                         .clickAndWaitForNewWindow()
                 }
             }
-
+            if (!checkBulbStatus()) turnOn(btn)
             prevRandomNumber = randomNumber
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
         }
@@ -480,8 +481,10 @@ class TapoSmartBulb (val device: UiDevice,
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_COLOR_PICKER.rid))
 
-        for (i in 1..10 step 1) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit color randomly]\n")
+        // il numbero di step da eseguire e' scelto in modo casuale tra 1 e 10
+        val maxStep = SecureRandom().nextInt(10).plus(1)
+        for (i in 1..maxStep step 1) {
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit color randomly]\n")
 
             val randomPair = getRandomDiskCoords(
             Pair(basicselector.bounds.left, basicselector.bounds.top),
@@ -499,7 +502,7 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun enablePartyTheme(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Enable party theme]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Enable party theme]\n")
 
         if (!checkBulbStatus()) turnOn(btn)
 
@@ -528,7 +531,7 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun enableRelaxTheme(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Enable relax theme]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Enable relax theme]\n")
 
         if (!checkBulbStatus()) turnOn(btn)
 

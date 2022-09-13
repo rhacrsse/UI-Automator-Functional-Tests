@@ -35,7 +35,7 @@ class EzvizSmartBulb (val device: UiDevice,
         allAppsButton.clickAndWaitForNewWindow()
     }
 
-    private fun openSmartBulb() {
+    private fun selectSmartBulbTab() {
         // Select Bulb Tab
         device.findObject(
             UiSelector().resourceId(
@@ -43,9 +43,14 @@ class EzvizSmartBulb (val device: UiDevice,
             .getChild(UiSelector().text(
                 SmartObjTextSelector.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_BULBS.textLabel)).click()
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
+    }
+
+    private fun openSmartBulb() {
+
+        selectSmartBulbTab()
 
         // switch on the bulb if it is off
-        if (!checkBulbStatus()) turnOn()
+        if (!checkBulbStatus()) { turnOn() }
 
         // Click on the Bulb button to open to bulb main layout
         device.findObject(
@@ -75,16 +80,16 @@ class EzvizSmartBulb (val device: UiDevice,
     }
 
     private fun click() {
-        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EVVIZ_SMARTHOME_STATE_BTN.rid)).click()
+        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
         smartObjState = when(checkBulbStatus()) {
             true -> {
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF bulb]\n")
+                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF bulb]\n")
                 SmartObjStates.STATE_OFF
             }
             false -> {
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON bulb]\n")
+                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON bulb]\n")
                 SmartObjStates.STATE_ON
             }
         }
@@ -103,7 +108,7 @@ class EzvizSmartBulb (val device: UiDevice,
     }
 
     private fun editBright() {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit brightness randomly]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit brightness randomly]\n")
 
         // [39,707][1041,760] - seek bar
         // [39,707][92,760] - circle bar swiper/dragger - left
@@ -118,7 +123,7 @@ class EzvizSmartBulb (val device: UiDevice,
 
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.EVVIZ_SMARTHOME_EDIT_BRIGHT_SEEK_BAR.rid))
+                SmartObjResourceIDs.EZVIZ_SMARTHOME_EDIT_BRIGHT_SEEK_BAR.rid))
             .dragTo(casualMove,middley,steps)
 
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
@@ -132,8 +137,10 @@ class EzvizSmartBulb (val device: UiDevice,
         device.click(colorBtn.first,colorBtn.second)
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
-        for (i in 1..10 step 1) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit color randomly]\n")
+        // il numbero di step da eseguire e' scelto in modo casuale tra 1 e 10
+        val maxStep = SecureRandom().nextInt(10).plus(1)
+        for (i in 1..maxStep step 1) {
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit color randomly]\n")
 
             val randomPair = getRandomDiskCoords(
             SmartObjCoords.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.startP,
@@ -152,8 +159,10 @@ class EzvizSmartBulb (val device: UiDevice,
         device.click(saturationBtn.first,saturationBtn.second)
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
-        for (i in 1..10 step 1) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit saturation randomly]\n")
+        // il numbero di step da eseguire e' scelto in modo casuale tra 1 e 10
+        val maxStep = SecureRandom().nextInt(10).plus(1)
+        for (i in 1..maxStep step 1) {
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit saturation randomly]\n")
 
             val randomPair = getRandomSemiCircleCoords(
                 SmartObjCoords.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.startP,
@@ -209,7 +218,9 @@ class EzvizSmartBulb (val device: UiDevice,
             val easter    = 7
         */
 
-        for (i in 1..10 step 1) {
+        // il numbero di step da eseguire e' scelto in modo casuale tra 1 e 10
+        val maxStep = SecureRandom().nextInt(10).plus(1)
+        for (i in 1..maxStep step 1) {
             // val randomNumber = Random.nextInt(0,7)
             val randomNumber = SecureRandom().nextInt(8)
 
@@ -226,7 +237,7 @@ class EzvizSmartBulb (val device: UiDevice,
                     else -> "error"
                 }
 
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Set preset mode $modes]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Set preset mode $modes]\n")
 
             baseBtn.getChild(
                 UiSelector().className(
@@ -302,11 +313,11 @@ class EzvizSmartBulb (val device: UiDevice,
         val seed = SecureRandom().nextInt(5).plus(1)
 
         when(seed) {
-            1  -> { if (!checkBulbStatus()) turnOn(); editBright() }
+            1  -> { selectSmartBulbTab();if (!checkBulbStatus()) { turnOn() }; editBright() }
             2  -> { openSmartBulb(); editColor(); pressBackButton() }
             3  -> { openSmartBulb(); editSaturation(); pressBackButton() }
             4  -> { openSmartBulb(); editModes(); pressBackButton() }
-            5 -> click()
+            5 -> { selectSmartBulbTab(); click() }
         }
 
         //pressHomeButton()
@@ -323,11 +334,11 @@ class EzvizSmartBulb (val device: UiDevice,
             device.findObject(UiSelector().resourceId("com.ezviz:id/iv_close")).click()
         }
 
-        if (!checkBulbStatus()) turnOn(); editBright()
+        selectSmartBulbTab(); if (!checkBulbStatus()) turnOn(); editBright()
         openSmartBulb(); editColor(); pressBackButton()
         openSmartBulb(); editSaturation(); pressBackButton()
         openSmartBulb(); editModes(); pressBackButton()
-        click()
+        selectSmartBulbTab(); click()
 
         //pressHomeButton()
     }

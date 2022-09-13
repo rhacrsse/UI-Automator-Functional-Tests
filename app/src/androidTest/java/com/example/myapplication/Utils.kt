@@ -101,8 +101,8 @@ enum class SmartObjResourceIDs(val rid: String) {
     TAPO_SMARTPLUG_STATE_BTN("com.tplink.iot:id/iv_switch"),
     EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT("com.ezviz:id/group_tab_layout"),
     EZVIZ_SMARTHOME_MAIN_LAYOUT("com.ezviz:id/main_layout"),
-    EVVIZ_SMARTHOME_STATE_BTN("com.ezviz:id/option_img"),
-    EVVIZ_SMARTHOME_EDIT_BRIGHT_SEEK_BAR("com.ezviz:id/seek_bar")
+    EZVIZ_SMARTHOME_STATE_BTN("com.ezviz:id/option_img"),
+    EZVIZ_SMARTHOME_EDIT_BRIGHT_SEEK_BAR("com.ezviz:id/seek_bar")
 }
 
 enum class SmartObjTextSelector(val textLabel: String) {
@@ -168,3 +168,5 @@ fun getTimestamp(): String {
 
     return current.format(formatter)
 }
+
+var SMARTOBJ_EVENT_NUMBER = 1

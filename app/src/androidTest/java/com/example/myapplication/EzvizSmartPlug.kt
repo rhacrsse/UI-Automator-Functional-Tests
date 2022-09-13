@@ -40,23 +40,23 @@ class EzvizSmartPlug (val device: UiDevice,
                 SmartObjTextSelector.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_PLUGS.textLabel)).click()
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
-        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EVVIZ_SMARTHOME_STATE_BTN.rid)).click()
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
+        //setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
         if (device.findObject(UiSelector().text("The device is working. It will stop working when disabled").resourceId("android:id/message")).exists()) {
             // Closing Popup window
             device.findObject(UiSelector().text("Disable").resourceId("android:id/button1")).click()
+            setDelay(2000)
         }
-
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        // if (!checkPlugStatus()) device.findObject(UiSelector().text("Disable").resourceId("android:id/button1")).click(); setDelay(2000)
 
         smartObjState = when(checkPlugStatus()) {
             true -> {
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF plug]\n")
+                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF plug]\n")
                 SmartObjStates.STATE_OFF
             }
             false -> {
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON plug]\n")
+                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON plug]\n")
                 SmartObjStates.STATE_ON
             }
         }

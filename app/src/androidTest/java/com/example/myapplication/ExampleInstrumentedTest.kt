@@ -44,52 +44,58 @@ class ExampleInstrumentedTest {
          */
 
         //for ( line in 1..5) {
-        //    writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: ${SmartObjAppNames.Tapo.name}] [Device: ${SmartObjType.SMARTBULB.type}] [ACTION: Loggo roba nel file, test$line]\n")
+        //    writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${SmartObjAppNames.Tapo.name}] [Device: ${SmartObjType.SMARTBULB.type}] [ACTION: Loggo roba nel file, test$line]\n")
         //}
         // return
 
-        val tapoSmartBulb = TapoSmartBulb(device=device, smartObjState=SmartObjStates.STATE_ON)
-        val ezvizSmartBulb = EzvizSmartBulb(device=device, smartObjState=SmartObjStates.STATE_ON)
+        val tapoSmartBulb = TapoSmartBulb(device=device, smartObjState=SmartObjStates.STATE_OFF)
+        val ezvizSmartBulb = EzvizSmartBulb(device=device, smartObjState=SmartObjStates.STATE_OFF)
 
         val tapoSmartPlug = TapoSmartPlug(device=device, smartObjState=SmartObjStates.STATE_OFF)
         val ezvizSmartPlug = EzvizSmartPlug(device=device, smartObjState=SmartObjStates.STATE_OFF)
 
         var nextpkgname: String = SmartObjPkgName.ANDROID.pkgName
         //Log.i("Previous package class: ", nextpkgname)
-
         //writeGroundTruthFile(gtfile,nextpkgname + "\n")
 
         // Log.i() TIMESTAMP(DATE TIME) APP ACTION
         for (i in 1..10) {
+            //while (true) {
             val currpkgname = device.currentPackageName
             //Log.i("Current package class: ", currpkgname)
             //writeGroundTruthFile(gtfile,currpkgname + "\n")
 
             // SecureRandom returns a value between 0 and n-1
-            val seed = SecureRandom().nextInt(2).plus(1)
+            val seed = SecureRandom().nextInt(4).plus(1)
 
-            when(seed) {
-                //1 -> {
-                //    nextpkgname = SmartObjPkgName.TAPO.pkgName
-                //    if (!nextpkgname.equals(currpkgname)) device.pressHome()
-                //    tapoSmartBulb.selectRandomInstrumentedTest()
-                //}
-                //1 -> {
-                //    nextpkgname = SmartObjPkgName.EZVIZ.pkgName
-                //    if (!nextpkgname.equals(currpkgname)) device.pressHome()
-                //    ezvizSmartBulb.selectRandomInstrumentedTest()
-                //}
+            when (seed) {
                 1 -> {
+                    nextpkgname = SmartObjPkgName.TAPO.pkgName
+                    if (!nextpkgname.equals(currpkgname)) device.pressHome()
+                    tapoSmartBulb.selectRandomInstrumentedTest()
+                }
+                2 -> {
+                    nextpkgname = SmartObjPkgName.EZVIZ.pkgName
+                    if (!nextpkgname.equals(currpkgname)) device.pressHome()
+                    ezvizSmartBulb.selectRandomInstrumentedTest()
+                }
+                3 -> {
                     nextpkgname = SmartObjPkgName.TAPO.pkgName
                     if (!nextpkgname.equals(currpkgname)) device.pressHome()
                     tapoSmartPlug.selectRandomInstrumentedTest()
                 }
-                2 -> {
+                4 -> {
                     nextpkgname = SmartObjPkgName.EZVIZ.pkgName
                     if (!nextpkgname.equals(currpkgname)) device.pressHome()
                     ezvizSmartPlug.selectRandomInstrumentedTest()
                 }
             }
+
+            SMARTOBJ_EVENT_NUMBER++
+
+            // randomizzare delay tra un evento e il successivo con un valore tra 1 e 5
+            // generare un evento ogni 60 s
+            Thread.sleep(SecureRandom().nextInt(5).plus(1).plus(1000).toLong())
         }
     }
 }

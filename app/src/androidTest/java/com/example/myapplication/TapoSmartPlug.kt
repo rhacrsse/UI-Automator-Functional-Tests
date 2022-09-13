@@ -69,7 +69,7 @@ class TapoSmartPlug (val device: UiDevice,
     }
 
     private fun click(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Click button]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Click button]\n")
 
         when(checkBulbStatus()) {
             true  -> turnOff(btn)
@@ -78,7 +78,7 @@ class TapoSmartPlug (val device: UiDevice,
     }
 
     private fun turnOn(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON plug]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON plug]\n")
 
         btn.click()
         smartObjState = SmartObjStates.STATE_ON
@@ -86,7 +86,7 @@ class TapoSmartPlug (val device: UiDevice,
     }
 
     private fun turnOff(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF plug]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF plug]\n")
 
         btn.click()
         smartObjState = SmartObjStates.STATE_OFF
