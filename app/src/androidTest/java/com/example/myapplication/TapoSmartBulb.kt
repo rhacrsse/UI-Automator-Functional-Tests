@@ -69,7 +69,7 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun click(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName.to] [DEVICE: $smartObjType] [ACTION: Click button]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Click button]\n")
 
         when(checkBulbStatus()) {
             true  -> turnOff(btn)
@@ -438,6 +438,7 @@ class TapoSmartBulb (val device: UiDevice,
                         UiSelector().resourceId(
                             SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_AUTO_COMPENSATE_MODE.rid))
                         .clickAndWaitForNewWindow()
+                    setDelay(SmartObjDelays.DELAY_ACTION.delay)
                 }
                 // auto-match
                 2 -> {
@@ -445,9 +446,13 @@ class TapoSmartBulb (val device: UiDevice,
                         UiSelector().resourceId(
                             SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_AUTO_MATCH_MODE.rid))
                         .clickAndWaitForNewWindow()
+                    setDelay(SmartObjDelays.DELAY_ACTION.delay)
                 }
             }
-            if (!checkBulbStatus()) turnOn(btn)
+
+            // Risoluzione bug che generava un'inconsistenza quando e' selezionato di default il bottone auto-compensate
+            // ed accediamo per la prima volta alla schermata di scelta tra auto-compensate e auto-match all'interno della window
+            if (!btn.isChecked) { smartObjState = SmartObjStates.STATE_OFF; turnOn(btn) }
             prevRandomNumber = randomNumber
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
         }

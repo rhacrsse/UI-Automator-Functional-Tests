@@ -58,8 +58,12 @@ class ExampleInstrumentedTest {
         //Log.i("Previous package class: ", nextpkgname)
         //writeGroundTruthFile(gtfile,nextpkgname + "\n")
 
+        ezvizSmartBulb.execSeqInstrumentedTest()
+        device.pressHome()
+        return
+
         // Log.i() TIMESTAMP(DATE TIME) APP ACTION
-        for (i in 1..10) {
+        for (i in 1..100) {
             //while (true) {
             val currpkgname = device.currentPackageName
             //Log.i("Current package class: ", currpkgname)
