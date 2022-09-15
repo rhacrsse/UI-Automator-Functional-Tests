@@ -51,6 +51,11 @@ class ExampleInstrumentedTest {
 
         // Log.i() TIMESTAMP(DATE TIME) APP ACTION
         for (i in 1..100) {
+            val st = System.currentTimeMillis()
+            // per generare un evento ogni 60 secondi togliendo i delay dati dall'esecuzione degli eventi
+            // andiamo a calcolare il tempo iniziale del ciclo e lo rapportiamo al tempo post esecuzione
+            // degli eventi prima del successivo ciclo.
+            // Tale valore in ms va sottratto a 60 s per settare la sleep.
             val currpkgname = device.currentPackageName
 
             // SecureRandom returns a value between 0 and n-1
@@ -82,7 +87,8 @@ class ExampleInstrumentedTest {
             SMARTOBJ_EVENT_NUMBER++
 
             // generare un evento ogni 60 s
-            //Thread.sleep(60000)
+            val et = System.currentTimeMillis()
+            //Thread.sleep((60000).minus(et.minus(st)))
         }
     }
 }
