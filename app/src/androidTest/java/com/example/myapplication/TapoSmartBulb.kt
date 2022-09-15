@@ -48,7 +48,7 @@ class TapoSmartBulb (val device: UiDevice,
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_STATE_BTN.rid))
 
-        if (!checkBulbStatus()) turnOn(smartBulbState)
+        //if (!checkBulbStatus()) turnOn(smartBulbState)
 
         return smartBulbState
     }
@@ -257,8 +257,8 @@ class TapoSmartBulb (val device: UiDevice,
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
-    private fun increaseSaturation(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Increase saturation]\n")
+    private fun increaseColorTemperature(btn: UiObject) {
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Increase color temperature]\n")
 
         if (!checkBulbStatus()) turnOn(btn)
 
@@ -291,8 +291,8 @@ class TapoSmartBulb (val device: UiDevice,
 
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_SATURATION.rid))
-            .swipeUp(2)
+                SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
+            .swipeDown(5)
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
         device.findObject(
@@ -302,8 +302,8 @@ class TapoSmartBulb (val device: UiDevice,
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
-    private fun decreaseSaturation(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Decrease saturation]\n")
+    private fun decreaseColorTemperature(btn: UiObject) {
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Decrease color temperature]\n")
 
         if (!checkBulbStatus()) turnOn(btn)
         val smartBulbPresetColors = device.findObject(
@@ -335,8 +335,8 @@ class TapoSmartBulb (val device: UiDevice,
 
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_SATURATION.rid))
-            .swipeDown(5)
+                SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
+            .swipeUp(3)
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
         device.findObject(
@@ -611,8 +611,8 @@ class TapoSmartBulb (val device: UiDevice,
             //4  -> decreaseBrightEditPresetWhiteLight(smartBulbState)
             //5  -> increaseBrightEditPresetColorLight(smartBulbState)
             //6  -> decreaseBrightEditPresetColorLight(smartBulbState)
-            3  -> increaseSaturation(smartBulbState)
-            4  -> decreaseSaturation(smartBulbState)
+            3  -> increaseColorTemperature(smartBulbState)
+            4  -> decreaseColorTemperature(smartBulbState)
             5  -> {
                 setPresetColor(smartBulbState)
             }
@@ -634,8 +634,8 @@ class TapoSmartBulb (val device: UiDevice,
 
         increaseBrightSlider(smartBulbState)
         decreaseBrightSlider(smartBulbState)
-        increaseSaturation(smartBulbState)
-        decreaseSaturation(smartBulbState)
+        increaseColorTemperature(smartBulbState)
+        decreaseColorTemperature(smartBulbState)
         setPresetColor(smartBulbState)
         editColor(smartBulbState)
         enablePartyTheme(smartBulbState)

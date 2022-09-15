@@ -151,18 +151,18 @@ class EzvizSmartBulb (val device: UiDevice,
         }
     }
 
-    private fun editSaturation() {
+    private fun editColorTemperature() {
 
-        val saturationBtn = getCenter(
-            SmartObjCoords.EZVIZ_SMARTBULB_SATURATION_BTN.startP,
-            SmartObjCoords.EZVIZ_SMARTBULB_SATURATION_BTN.endP)
-        device.click(saturationBtn.first,saturationBtn.second)
+        val colorTemperatureBtn = getCenter(
+            SmartObjCoords.EZVIZ_SMARTBULB_COLOR_TEMPERATURE_BTN.startP,
+            SmartObjCoords.EZVIZ_SMARTBULB_COLOR_TEMPERATURE_BTN.endP)
+        device.click(colorTemperatureBtn.first,colorTemperatureBtn.second)
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
         // il numbero di step da eseguire e' scelto in modo casuale tra 1 e 10
         val maxStep = SecureRandom().nextInt(10).plus(1)
         for (i in 1..maxStep step 1) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit saturation randomly]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit color temperature randomly]\n")
 
             val randomPair = getRandomSemiCircleCoords(
                 SmartObjCoords.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.startP,
@@ -315,7 +315,7 @@ class EzvizSmartBulb (val device: UiDevice,
         when(seed) {
             1  -> { selectSmartBulbTab();if (!checkBulbStatus()) { turnOn() }; editBright() }
             2  -> { openSmartBulb(); editColor(); pressBackButton() }
-            3  -> { openSmartBulb(); editSaturation(); pressBackButton() }
+            3  -> { openSmartBulb(); editColorTemperature(); pressBackButton() }
             4  -> { openSmartBulb(); editModes(); pressBackButton() }
             5 -> { selectSmartBulbTab(); click() }
         }
@@ -336,7 +336,7 @@ class EzvizSmartBulb (val device: UiDevice,
 
         selectSmartBulbTab(); if (!checkBulbStatus()) turnOn(); editBright()
         openSmartBulb(); editColor(); pressBackButton()
-        openSmartBulb(); editSaturation(); pressBackButton()
+        openSmartBulb(); editColorTemperature(); pressBackButton()
         openSmartBulb(); editModes(); pressBackButton()
         selectSmartBulbTab(); click()
 

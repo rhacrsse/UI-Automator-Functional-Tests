@@ -59,7 +59,7 @@ class ExampleInstrumentedTest {
         //writeGroundTruthFile(gtfile,nextpkgname + "\n")
 
         // Log.i() TIMESTAMP(DATE TIME) APP ACTION
-        for (i in 1..100) {
+        for (i in 1..20) {
             //while (true) {
             val currpkgname = device.currentPackageName
             //Log.i("Current package class: ", currpkgname)
@@ -96,7 +96,7 @@ class ExampleInstrumentedTest {
             // randomizzare delay tra un evento e il successivo con un valore tra 1 e 5
             // generare un evento ogni 60 s
             //Thread.sleep(60000)
-            Thread.sleep(SecureRandom().nextInt(5).plus(1).plus(1000).toLong())
+            //Thread.sleep(SecureRandom().nextInt(5).plus(1).plus(1000).toLong())
         }
     }
 }
