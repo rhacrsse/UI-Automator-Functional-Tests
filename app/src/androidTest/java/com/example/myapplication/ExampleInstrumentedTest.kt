@@ -30,23 +30,16 @@ class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
         // Context of the app under test.
-        //val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        //assertEquals("com.example.myapplication", appContext.packageName)
         val device: UiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         /*
-        Implementare un controllo per randomizzare l'apertura dell'applicazione in base
-        a quella attualmente aperta, se quella attulamente aperta è quella che dobbiamo usare
+        Controllo che randomizza l'apertura dell'applicazione in base
+        a quella attualmente aperta, se quella attualmente aperta è quella che dobbiamo usare
         allora possiamo lanciare direttamente il comando che ci serve, altrimenti la chiudiamo
         e apriamo l'altra.
-        Questo per evitare di chiudere e riaprire la stessa applicazione pià volte
+        Questo per evitare di chiudere e riaprire la stessa applicazione piu' volte
         consecutivamente.
          */
-
-        //for ( line in 1..5) {
-        //    writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${SmartObjAppNames.Tapo.name}] [Device: ${SmartObjType.SMARTBULB.type}] [ACTION: Loggo roba nel file, test$line]\n")
-        //}
-        // return
 
         val tapoSmartBulb = TapoSmartBulb(device=device, smartObjState=SmartObjStates.STATE_OFF)
         val ezvizSmartBulb = EzvizSmartBulb(device=device, smartObjState=SmartObjStates.STATE_OFF)
@@ -55,15 +48,10 @@ class ExampleInstrumentedTest {
         val ezvizSmartPlug = EzvizSmartPlug(device=device, smartObjState=SmartObjStates.STATE_OFF)
 
         var nextpkgname: String = SmartObjPkgName.ANDROID.pkgName
-        //Log.i("Previous package class: ", nextpkgname)
-        //writeGroundTruthFile(gtfile,nextpkgname + "\n")
 
         // Log.i() TIMESTAMP(DATE TIME) APP ACTION
-        for (i in 1..20) {
-            //while (true) {
+        for (i in 1..100) {
             val currpkgname = device.currentPackageName
-            //Log.i("Current package class: ", currpkgname)
-            //writeGroundTruthFile(gtfile,currpkgname + "\n")
 
             // SecureRandom returns a value between 0 and n-1
             val seed = SecureRandom().nextInt(4).plus(1)
@@ -93,10 +81,8 @@ class ExampleInstrumentedTest {
 
             SMARTOBJ_EVENT_NUMBER++
 
-            // randomizzare delay tra un evento e il successivo con un valore tra 1 e 5
             // generare un evento ogni 60 s
             //Thread.sleep(60000)
-            //Thread.sleep(SecureRandom().nextInt(5).plus(1).plus(1000).toLong())
         }
     }
 }

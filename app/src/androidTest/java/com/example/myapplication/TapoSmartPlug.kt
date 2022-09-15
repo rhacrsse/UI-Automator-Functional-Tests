@@ -48,17 +48,11 @@ class TapoSmartPlug (val device: UiDevice,
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTPLUG_STATE_BTN.rid))
 
-        //if (!checkBulbStatus()) turnOn(smartPlugState)
-
         return smartPlugState
     }
 
     private fun pressBackButton() {
         device.pressBack()
-    }
-
-    private fun pressHomeButton() {
-        device.pressHome()
     }
 
     private fun checkBulbStatus(): Boolean {
@@ -96,6 +90,12 @@ class TapoSmartPlug (val device: UiDevice,
     fun selectRandomInstrumentedTest() {
 
         if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) launchSmartApp()
+
+        if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
+            // Closing Popup window
+            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
+        }
+
         val smartPlugState = openSmartPlug()
 
         click(smartPlugState)
@@ -107,6 +107,11 @@ class TapoSmartPlug (val device: UiDevice,
     fun execSeqInstrumentedTest() {
 
         if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
+
+        if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
+            // Closing Popup window
+            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
+        }
 
         val smartPlugState = openSmartPlug()
 

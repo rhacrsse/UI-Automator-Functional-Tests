@@ -14,13 +14,6 @@ class EzvizSmartBulb (val device: UiDevice,
                       private val smartObjAppName: String = SmartObjAppNames.EZVIZ.toString(),
                       private val smartObjType: String = SmartObjTypes.SMARTBULB.type,
                       private var smartObjState: SmartObjStates = SmartObjStates.STATE_ON
-                      // per l'implementazione delle modifiche di colore, luminosita e saturazione
-                      // selezionare un solo metodo da utilizzare altrimenti diventa complicato
-                      // gestire piu posizioni in contemporanea, keep it simple, quindi
-                      // consiglierei di usare la modifica diretta da schermata principale
-                      // per la luminosità
-                      //
-                      // Fare la stessa cosa per Tapo
                       ) {
 
     private fun setDelay(delay: Long) {
@@ -68,10 +61,6 @@ class EzvizSmartBulb (val device: UiDevice,
         device.pressBack()
     }
 
-    private fun pressHomeButton() {
-        device.pressHome()
-    }
-
     private fun checkBulbStatus(): Boolean {
         return when(smartObjState){
             SmartObjStates.STATE_ON  -> SmartObjStates.STATE_ON.state
@@ -98,12 +87,6 @@ class EzvizSmartBulb (val device: UiDevice,
     private fun turnOn() {
         click()
         smartObjState = SmartObjStates.STATE_ON
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
-    }
-
-    private fun turnOff() {
-        click()
-        smartObjState = SmartObjStates.STATE_OFF
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
@@ -221,7 +204,6 @@ class EzvizSmartBulb (val device: UiDevice,
         // il numbero di step da eseguire e' scelto in modo casuale tra 1 e 10
         val maxStep = SecureRandom().nextInt(10).plus(1)
         for (i in 1..maxStep step 1) {
-            // val randomNumber = Random.nextInt(0,7)
             val randomNumber = SecureRandom().nextInt(8)
 
             val modes =
@@ -280,8 +262,8 @@ class EzvizSmartBulb (val device: UiDevice,
     }
 
     //
-    // Aggiungere ai parametri da passare alla funzione le coordinate iniziali e finali
-    // del pallino che serve a fare lo swipe sullo schermo, il raggio del pallino va tolto
+    // Ai parametri da passare alla funzione sono state aggiunte le coordinate iniziali e finali
+    // del pallino che serve a fare lo swipe sullo schermo, il raggio del pallino e' stato tolto
     // dal raggio complessivo del semi-cerchio (STIMATI EMPIRICAMENTE TRAMITE UIAUTOMATORVIEWER)
     //
     private fun getRandomSemiCircleCoords(startP: Pair<Int,Int>, endP: Pair<Int,Int>): Pair<Int,Int> {
@@ -303,11 +285,9 @@ class EzvizSmartBulb (val device: UiDevice,
 
         if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
 
-        if (device.findObject(UiSelector().text("Enjoying EZVIZ?")).exists()) {
+        if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_FEEDBACK.textLabel)).exists()) {
             // Closing Popup window
-            //device.findObject(UiSelector().text("Enjoying EZVIZ?")).click()
-            //device.findObject(UiSelector().resourceId("com.ezviz:id/tv_next_time")).click()
-            device.findObject(UiSelector().resourceId("com.ezviz:id/iv_close")).click()
+            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
         }
 
         val seed = SecureRandom().nextInt(5).plus(1)
@@ -319,19 +299,14 @@ class EzvizSmartBulb (val device: UiDevice,
             4  -> { openSmartBulb(); editModes(); pressBackButton() }
             5 -> { selectSmartBulbTab(); click() }
         }
-
-        //pressHomeButton()
     }
 
     fun execSeqInstrumentedTest() {
 
         if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
 
-        if (device.findObject(UiSelector().text("Enjoying EZVIZ?")).exists()) {
-            // Closing Popup window
-            //device.findObject(UiSelector().text("Enjoying EZVIZ?")).click()
-            //device.findObject(UiSelector().resourceId("com.ezviz:id/tv_next_time")).click()
-            device.findObject(UiSelector().resourceId("com.ezviz:id/iv_close")).click()
+        if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_FEEDBACK.textLabel)).exists()) {
+            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
         }
 
         selectSmartBulbTab(); if (!checkBulbStatus()) turnOn(); editBright()
@@ -339,7 +314,5 @@ class EzvizSmartBulb (val device: UiDevice,
         openSmartBulb(); editColorTemperature(); pressBackButton()
         openSmartBulb(); editModes(); pressBackButton()
         selectSmartBulbTab(); click()
-
-        //pressHomeButton()
     }
 }

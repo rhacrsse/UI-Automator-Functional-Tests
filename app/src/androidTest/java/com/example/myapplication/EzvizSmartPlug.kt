@@ -41,14 +41,12 @@ class EzvizSmartPlug (val device: UiDevice,
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
         device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
-        //setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
         if (device.findObject(UiSelector().text("The device is working. It will stop working when disabled").resourceId("android:id/message")).exists()) {
             // Closing Popup window
             device.findObject(UiSelector().text("Disable").resourceId("android:id/button1")).click()
             setDelay(2000)
         }
-        // if (!checkPlugStatus()) device.findObject(UiSelector().text("Disable").resourceId("android:id/button1")).click(); setDelay(2000)
 
         smartObjState = when(checkPlugStatus()) {
             true -> {
@@ -66,11 +64,9 @@ class EzvizSmartPlug (val device: UiDevice,
 
         if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
 
-        if (device.findObject(UiSelector().text("Enjoying EZVIZ?")).exists()) {
+        if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_FEEDBACK.textLabel)).exists()) {
             // Closing Popup window
-            //device.findObject(UiSelector().text("Enjoying EZVIZ?")).click()
-            //device.findObject(UiSelector().resourceId("com.ezviz:id/tv_next_time")).click()
-            device.findObject(UiSelector().resourceId("com.ezviz:id/iv_close")).click()
+            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
         }
 
         // [825,1472][986,1634] statistics coordinates smartplug
@@ -81,11 +77,9 @@ class EzvizSmartPlug (val device: UiDevice,
 
         if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
 
-        if (device.findObject(UiSelector().text("Enjoying EZVIZ?")).exists()) {
+        if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_FEEDBACK.textLabel)).exists()) {
             // Closing Popup window
-            //device.findObject(UiSelector().text("Enjoying EZVIZ?")).click()
-            //device.findObject(UiSelector().resourceId("com.ezviz:id/tv_next_time")).click()
-            device.findObject(UiSelector().resourceId("com.ezviz:id/iv_close")).click()
+            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
         }
 
         click()
