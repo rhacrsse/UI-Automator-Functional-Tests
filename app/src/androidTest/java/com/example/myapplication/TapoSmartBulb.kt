@@ -32,18 +32,21 @@ class TapoSmartBulb (val device: UiDevice,
 
     private fun openSmartBulb(): UiObject {
 
+        checkPopUpFeedback()
         // Apro i preferiti
         device.findObject(
             UiSelector().text(
                 SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_ALL.textLabel))
             .clickAndWaitForNewWindow()
 
+        checkPopUpFeedback()
         // Apro la schermata di controllo dello smart bulb
          device.findObject(
              UiSelector().text(
                  SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_BULBS.textLabel))
              .clickAndWaitForNewWindow()
 
+        checkPopUpFeedback()
         val smartBulbState = device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_STATE_BTN.rid))
@@ -74,6 +77,7 @@ class TapoSmartBulb (val device: UiDevice,
     private fun turnOn(btn: UiObject) {
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON bulb]\n")
 
+        checkPopUpFeedback()
         btn.click()
         smartObjState = SmartObjStates.STATE_ON
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
@@ -82,6 +86,7 @@ class TapoSmartBulb (val device: UiDevice,
     private fun turnOff(btn: UiObject) {
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF bulb]\n")
 
+        checkPopUpFeedback()
         btn.click()
         smartObjState = SmartObjStates.STATE_OFF
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
@@ -90,12 +95,15 @@ class TapoSmartBulb (val device: UiDevice,
     private fun increaseBrightSlider(btn: UiObject) {
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Increase brightness]\n")
 
+        checkPopUpFeedback()
         if (!checkBulbStatus()) turnOn(btn)
+        checkPopUpFeedback()
         val smartBulbBrightness =
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_MASK_VIEW.rid))
 
+        checkPopUpFeedback()
         smartBulbBrightness.swipeUp(SecureRandom().nextInt(11).plus(2))
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
@@ -103,12 +111,15 @@ class TapoSmartBulb (val device: UiDevice,
     private fun decreaseBrightSlider(btn: UiObject) {
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Decrease brightness]\n")
 
+        checkPopUpFeedback()
         if (!checkBulbStatus()) turnOn(btn)
+        checkPopUpFeedback()
         val smartBulbBrightness =
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_MASK_VIEW.rid))
 
+        checkPopUpFeedback()
         smartBulbBrightness.swipeDown(SecureRandom().nextInt(11).plus(2))
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
@@ -116,20 +127,24 @@ class TapoSmartBulb (val device: UiDevice,
     private fun increaseColorTemperature(btn: UiObject) {
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Increase color temperature]\n")
 
+        checkPopUpFeedback()
         if (!checkBulbStatus()) turnOn(btn)
 
+        checkPopUpFeedback()
         val smartBulbPresetColors = device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid
             )
         )
 
+        checkPopUpFeedback()
         smartBulbPresetColors.getChild(
             UiSelector().className(
                 SmartObjClassNames.TAPO_ANDROID_VIEW.cn
             ).index(2)
         )
             .click()
+        checkPopUpFeedback()
         smartBulbPresetColors.getChild(
             UiSelector().className(
                 SmartObjClassNames.TAPO_ANDROID_VIEW.cn
@@ -139,18 +154,21 @@ class TapoSmartBulb (val device: UiDevice,
 
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
+        checkPopUpFeedback()
         // White Light
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_BTN.rid))
             .clickAndWaitForNewWindow()
 
+        checkPopUpFeedback()
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
             .swipeDown(5)
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
+        checkPopUpFeedback()
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_CLOSE_BTN.rid))
@@ -161,19 +179,23 @@ class TapoSmartBulb (val device: UiDevice,
     private fun decreaseColorTemperature(btn: UiObject) {
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Decrease color temperature]\n")
 
+        checkPopUpFeedback()
         if (!checkBulbStatus()) turnOn(btn)
+        checkPopUpFeedback()
         val smartBulbPresetColors = device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid
             )
         )
 
+        checkPopUpFeedback()
         smartBulbPresetColors.getChild(
             UiSelector().className(
                 SmartObjClassNames.TAPO_ANDROID_VIEW.cn
             ).index(2)
         )
             .click()
+        checkPopUpFeedback()
         smartBulbPresetColors.getChild(
             UiSelector().className(
                 SmartObjClassNames.TAPO_ANDROID_VIEW.cn
@@ -183,18 +205,21 @@ class TapoSmartBulb (val device: UiDevice,
 
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
+        checkPopUpFeedback()
         // White Light
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_BTN.rid))
             .clickAndWaitForNewWindow()
 
+        checkPopUpFeedback()
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
             .swipeUp(3)
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
+        checkPopUpFeedback()
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_CLOSE_BTN.rid))
@@ -203,7 +228,9 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun setPresetColor(btn: UiObject) {
+        checkPopUpFeedback()
         if (!checkBulbStatus()) turnOn(btn)
+        checkPopUpFeedback()
         val smartBulbPresetColors = device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid))
@@ -282,12 +309,14 @@ class TapoSmartBulb (val device: UiDevice,
                 else -> randomNumber.minus(2)
             }
 
+            checkPopUpFeedback()
             smartBulbPresetColors.getChild(UiSelector().className(SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(idx)).click()
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
             when(randomNumber) {
                 // auto-compensate
                 1 -> {
+                    checkPopUpFeedback()
                     device.findObject(
                         UiSelector().resourceId(
                             SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_AUTO_COMPENSATE_MODE.rid))
@@ -296,6 +325,7 @@ class TapoSmartBulb (val device: UiDevice,
                 }
                 // auto-match
                 2 -> {
+                    checkPopUpFeedback()
                     device.findObject(
                         UiSelector().resourceId(
                             SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_AUTO_MATCH_MODE.rid))
@@ -306,6 +336,7 @@ class TapoSmartBulb (val device: UiDevice,
 
             // Risoluzione bug che generava un'inconsistenza quando e' selezionato di default il bottone auto-compensate
             // ed accediamo per la prima volta alla schermata di scelta tra auto-compensate e auto-match all'interno della window
+            checkPopUpFeedback()
             if (!btn.isChecked) { smartObjState = SmartObjStates.STATE_OFF; turnOn(btn) }
             prevRandomNumber = randomNumber
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
@@ -313,22 +344,27 @@ class TapoSmartBulb (val device: UiDevice,
     }
 
     private fun editColor(btn: UiObject) {
+        checkPopUpFeedback()
         if (!checkBulbStatus()) turnOn(btn)
 
+        checkPopUpFeedback()
         val smartBulbPresetColors = device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid))
 
+        checkPopUpFeedback()
         smartBulbPresetColors.getChild(
             UiSelector().className(
                 SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
             .click()
+        checkPopUpFeedback()
         smartBulbPresetColors.getChild(
             UiSelector().className(
                 SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
             .click()
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
+        checkPopUpFeedback()
         // Color Light
         device.findObject(
             UiSelector().resourceId(
@@ -336,6 +372,7 @@ class TapoSmartBulb (val device: UiDevice,
             .clickAndWaitForNewWindow()
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
+        checkPopUpFeedback()
         val basicselector = device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_COLOR_PICKER.rid))
@@ -349,10 +386,12 @@ class TapoSmartBulb (val device: UiDevice,
             Pair(basicselector.bounds.left, basicselector.bounds.top),
             Pair(basicselector.bounds.right, basicselector.bounds.bottom))
 
+            checkPopUpFeedback()
             device.click(randomPair.first,randomPair.second)
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
         }
 
+        checkPopUpFeedback()
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_CLOSE_BTN.rid))
@@ -363,25 +402,31 @@ class TapoSmartBulb (val device: UiDevice,
     private fun enablePartyTheme(btn: UiObject) {
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Enable party theme]\n")
 
+        checkPopUpFeedback()
         if (!checkBulbStatus()) turnOn(btn)
 
+        checkPopUpFeedback()
         // Click Theme button
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
             .clickAndWaitForNewWindow()
 
+        checkPopUpFeedback()
         // Mode Direct - Party
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_DIRECT_PARTY_BTN.rid)).click()
         setDelay(SmartObjDelays.DELAY_WINDOW.delay)
+
+        checkPopUpFeedback()
         // Stop Party Mode
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid)).click()
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
+        checkPopUpFeedback()
         // Click exit btn
         device.findObject(
             UiSelector().resourceId(
@@ -392,26 +437,32 @@ class TapoSmartBulb (val device: UiDevice,
     private fun enableRelaxTheme(btn: UiObject) {
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Enable relax theme]\n")
 
+        checkPopUpFeedback()
         if (!checkBulbStatus()) turnOn(btn)
 
+        checkPopUpFeedback()
         // Click Theme button
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
             .clickAndWaitForNewWindow()
 
+        checkPopUpFeedback()
         // Mode Breath - Relax
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BREATH_RELAX_BTN.rid))
             .clickAndWaitForNewWindow()
         setDelay(SmartObjDelays.DELAY_WINDOW.delay)
+
+        checkPopUpFeedback()
         // Stop Relax Mode
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid)).click()
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
+        checkPopUpFeedback()
         // Click exit btn
         device.findObject(
             UiSelector().resourceId(
@@ -451,14 +502,18 @@ class TapoSmartBulb (val device: UiDevice,
         return Pair((cencoords.first).plus(randomx), (cencoords.second).plus(randomy))
     }
 
-    fun selectRandomInstrumentedTest() {
-
-        if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) launchSmartApp()
-
+    private fun checkPopUpFeedback() {
         if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
             // Closing Popup window
             device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
         }
+    }
+
+    fun selectRandomInstrumentedTest() {
+
+        if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) launchSmartApp()
+
+        checkPopUpFeedback()
 
         val smartBulbState = openSmartBulb()
 
@@ -486,10 +541,7 @@ class TapoSmartBulb (val device: UiDevice,
 
         if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
 
-        if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
-            // Closing Popup window
-            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
-        }
+        checkPopUpFeedback()
 
         val smartBulbState = openSmartBulb()
 

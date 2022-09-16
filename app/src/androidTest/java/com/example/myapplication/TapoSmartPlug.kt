@@ -32,18 +32,21 @@ class TapoSmartPlug (val device: UiDevice,
 
     private fun openSmartPlug(): UiObject {
 
+        checkPopUpFeedback()
         // Apro i preferiti
         device.findObject(
             UiSelector().text(
                 SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_ALL.textLabel))
             .clickAndWaitForNewWindow()
 
+        checkPopUpFeedback()
         // Apro la schermata di controllo dello smart plug
          device.findObject(
              UiSelector().text(
                  SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_PLUGS.textLabel))
              .clickAndWaitForNewWindow()
 
+        checkPopUpFeedback()
         val smartPlugState = device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTPLUG_STATE_BTN.rid))
@@ -74,6 +77,7 @@ class TapoSmartPlug (val device: UiDevice,
     private fun turnOn(btn: UiObject) {
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON plug]\n")
 
+        checkPopUpFeedback()
         btn.click()
         smartObjState = SmartObjStates.STATE_ON
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
@@ -82,19 +86,24 @@ class TapoSmartPlug (val device: UiDevice,
     private fun turnOff(btn: UiObject) {
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF plug]\n")
 
+        checkPopUpFeedback()
         btn.click()
         smartObjState = SmartObjStates.STATE_OFF
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
+    }
+
+    private fun checkPopUpFeedback() {
+        if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
+            // Closing Popup window
+            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
+        }
     }
 
     fun selectRandomInstrumentedTest() {
 
         if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) launchSmartApp()
 
-        if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
-            // Closing Popup window
-            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
-        }
+        checkPopUpFeedback()
 
         val smartPlugState = openSmartPlug()
 
@@ -108,10 +117,7 @@ class TapoSmartPlug (val device: UiDevice,
 
         if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
 
-        if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
-            // Closing Popup window
-            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
-        }
+        checkPopUpFeedback()
 
         val smartPlugState = openSmartPlug()
 

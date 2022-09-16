@@ -60,14 +60,18 @@ class EzvizSmartPlug (val device: UiDevice,
         }
     }
 
-    fun selectRandomInstrumentedTest() {
-
-        if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
-
+    private fun checkPopUpFeedback() {
         if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_FEEDBACK.textLabel)).exists()) {
             // Closing Popup window
             device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
         }
+    }
+
+    fun selectRandomInstrumentedTest() {
+
+        if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
+
+        checkPopUpFeedback()
 
         // [825,1472][986,1634] statistics coordinates smartplug
         click()
@@ -77,10 +81,7 @@ class EzvizSmartPlug (val device: UiDevice,
 
         if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
 
-        if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_FEEDBACK.textLabel)).exists()) {
-            // Closing Popup window
-            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
-        }
+        checkPopUpFeedback()
 
         click()
     }
