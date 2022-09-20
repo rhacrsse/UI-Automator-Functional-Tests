@@ -50,7 +50,7 @@ class ExampleInstrumentedTest {
         var nextpkgname: String = SmartObjPkgName.ANDROID.pkgName
 
         // Log.i() TIMESTAMP(DATE TIME) APP ACTION
-        for (i in 1..100) {
+        for (i in 1..50) {
             val st = System.currentTimeMillis()
             // per generare un evento ogni 60 secondi togliendo i delay dati dall'esecuzione degli eventi
             // andiamo a calcolare il tempo iniziale del ciclo e lo rapportiamo al tempo post esecuzione

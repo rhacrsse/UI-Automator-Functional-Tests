@@ -181,7 +181,7 @@ class TapoSmartBulb (val device: UiDevice,
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
-                .swipeDown(SecureRandom().nextInt(5).plus(1))
+                .swipeDown(SecureRandom().nextInt(3).plus(3))
 
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Increase color temperature]\n")
 
@@ -239,7 +239,7 @@ class TapoSmartBulb (val device: UiDevice,
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
-                .swipeUp(SecureRandom().nextInt(5).plus(1))
+                .swipeUp(SecureRandom().nextInt(3).plus(3))
 
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Decrease color temperature]\n")
 
