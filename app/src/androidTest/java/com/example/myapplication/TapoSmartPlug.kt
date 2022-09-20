@@ -30,65 +30,73 @@ class TapoSmartPlug (val device: UiDevice,
         allAppsButton.clickAndWaitForNewWindow()
     }
 
-    private fun openSmartPlug(): UiObject {
+    private fun openSmartPlug(): Int {
 
-        checkPopUpFeedback()
-        // Apro i preferiti
-        device.findObject(
-            UiSelector().text(
-                SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_ALL.textLabel))
-            .clickAndWaitForNewWindow()
+        try {
+            // Apro i preferiti
+            device.findObject(
+                UiSelector().text(
+                    SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_ALL.textLabel))
+                .clickAndWaitForNewWindow()
+        } catch (e: Exception) {
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.printStackTrace()}]\n")
+            return 0
+        }
 
-        checkPopUpFeedback()
-        // Apro la schermata di controllo dello smart plug
-         device.findObject(
-             UiSelector().text(
-                 SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_PLUGS.textLabel))
-             .clickAndWaitForNewWindow()
+        try {
+            // Apro la schermata di controllo dello smart plug
+            device.findObject(
+                UiSelector().text(
+                    SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_PLUGS.textLabel))
+                .clickAndWaitForNewWindow()
+        } catch (e: Exception) {
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.printStackTrace()}]\n")
+            return 1
+        }
 
-        checkPopUpFeedback()
-        val smartPlugState = device.findObject(
-            UiSelector().resourceId(
-                SmartObjResourceIDs.TAPO_SMARTPLUG_STATE_BTN.rid))
-
-        return smartPlugState
+        return 2
     }
 
     private fun pressBackButton() {
         device.pressBack()
     }
 
-    private fun checkBulbStatus(): Boolean {
+    private fun checkPlugStatus(): Boolean {
         return when(smartObjState){
             SmartObjStates.STATE_ON  -> SmartObjStates.STATE_ON.state
             SmartObjStates.STATE_OFF -> SmartObjStates.STATE_OFF.state
         }
     }
 
-    private fun click(btn: UiObject) {
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Click button]\n")
+    private fun click() {
 
-        when(checkBulbStatus()) {
-            true  -> turnOff(btn)
-            false -> turnOn(btn)
+        try {
+            when(checkPlugStatus()) {
+                true  -> turnOff()
+                false -> turnOn()
+            }
+        } catch (e: Exception) {
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.printStackTrace()}]\n")
         }
     }
 
-    private fun turnOn(btn: UiObject) {
+    private fun turnOn() {
+
+        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTPLUG_STATE_BTN.rid)).click()
+        smartObjState = SmartObjStates.STATE_ON
+
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON plug]\n")
 
-        checkPopUpFeedback()
-        btn.click()
-        smartObjState = SmartObjStates.STATE_ON
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
-    private fun turnOff(btn: UiObject) {
+    private fun turnOff() {
+
+        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTPLUG_STATE_BTN.rid)).click()
+        smartObjState = SmartObjStates.STATE_OFF
+
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF plug]\n")
 
-        checkPopUpFeedback()
-        btn.click()
-        smartObjState = SmartObjStates.STATE_OFF
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
@@ -105,12 +113,14 @@ class TapoSmartPlug (val device: UiDevice,
 
         checkPopUpFeedback()
 
-        val smartPlugState = openSmartPlug()
+        val stepv = openSmartPlug()
 
-        click(smartPlugState)
+        if (stepv == 2) {
+            click()
+        }
 
-        pressBackButton()
-        pressBackButton()
+        if (stepv  > 0) pressBackButton()
+        if (stepv == 2) pressBackButton()
     }
 
     fun execSeqInstrumentedTest() {
@@ -119,11 +129,13 @@ class TapoSmartPlug (val device: UiDevice,
 
         checkPopUpFeedback()
 
-        val smartPlugState = openSmartPlug()
+        val stepv = openSmartPlug()
 
-        click(smartPlugState)
+        if (stepv == 2) {
+            click()
+        }
 
-        pressBackButton()
-        pressBackButton()
+        if (stepv  > 0) pressBackButton()
+        if (stepv == 2) pressBackButton()
     }
 }

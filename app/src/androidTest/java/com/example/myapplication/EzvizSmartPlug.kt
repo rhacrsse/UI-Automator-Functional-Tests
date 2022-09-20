@@ -16,12 +16,25 @@ class EzvizSmartPlug (val device: UiDevice,
     private fun setDelay(delay: Long) {
         Thread.sleep(delay)
     }
+
     private fun launchSmartApp() {
         val allAppsButton: UiObject = device.findObject(
             UiSelector().description(
                 smartObjAppName))
 
         allAppsButton.clickAndWaitForNewWindow()
+    }
+
+    private fun selectSmartPlugTab() {
+
+        // Select Plug Tab
+        device.findObject(
+            UiSelector().resourceId(
+                SmartObjResourceIDs.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT.rid))
+            .getChild(UiSelector().text(
+                SmartObjTextSelector.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_PLUGS.textLabel)).click()
+
+        setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
     private fun checkPlugStatus(): Boolean {
@@ -32,32 +45,49 @@ class EzvizSmartPlug (val device: UiDevice,
     }
 
     private fun click() {
-        // Select Plug Tab
-        device.findObject(
-            UiSelector().resourceId(
-                SmartObjResourceIDs.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT.rid))
-            .getChild(UiSelector().text(
-                SmartObjTextSelector.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_PLUGS.textLabel)).click()
+
+        try {
+            selectSmartPlugTab()
+        } catch (e: Exception) {
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.printStackTrace()}]\n")
+            return
+        }
+
+        try {
+            when(checkPlugStatus()) {
+                true  -> turnOff()
+                false -> turnOn()
+            }
+        } catch (e: Exception) {
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.printStackTrace()}]\n")
+        }
+    }
+
+    private fun turnOn() {
+
+        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
+        smartObjState = SmartObjStates.STATE_ON
+
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON plug]\n")
+
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
+    }
+
+    private fun turnOff() {
 
         device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
 
-        if (device.findObject(UiSelector().text("The device is working. It will stop working when disabled").resourceId("android:id/message")).exists()) {
+        if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_SMARTPLUG_POPUP_TURNOFF_PLUG_MESSAGE.textLabel).resourceId(SmartObjResourceIDs.ANDROID_MESSAGE.rid)).exists()) {
             // Closing Popup window
-            device.findObject(UiSelector().text("Disable").resourceId("android:id/button1")).click()
-            setDelay(2000)
+            device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_SMARTPLUG_DISABLE_TAG.textLabel).resourceId(SmartObjResourceIDs.ANDROID_BUTTON1.rid)).click()
+            setDelay(SmartObjDelays.DELAY_ACTION.delay)
         }
 
-        smartObjState = when(checkPlugStatus()) {
-            true -> {
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF plug]\n")
-                SmartObjStates.STATE_OFF
-            }
-            false -> {
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON plug]\n")
-                SmartObjStates.STATE_ON
-            }
-        }
+        smartObjState = SmartObjStates.STATE_OFF
+
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF plug]\n")
+
+        setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
     private fun checkPopUpFeedback() {
@@ -73,7 +103,6 @@ class EzvizSmartPlug (val device: UiDevice,
 
         checkPopUpFeedback()
 
-        // [825,1472][986,1634] statistics coordinates smartplug
         click()
     }
 

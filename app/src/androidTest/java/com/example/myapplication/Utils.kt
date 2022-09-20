@@ -46,7 +46,7 @@ enum class SmartObjAppNames {
 
 enum class SmartObjDelays(val delay: Long) {
     DELAY_WINDOW(5000),
-    DELAY_ACTION(1000)
+    DELAY_ACTION(2000)
 }
 
 enum class SmartObjCoords(val startP: Pair<Int,Int>, val endP: Pair<Int,Int>) {
@@ -65,8 +65,10 @@ enum class SmartObjClassNames(val cn: String) {
 
 enum class SmartObjResourceIDs(val rid: String) {
     ANDROID_CONTENT("android:id/content"),
+    ANDROID_MESSAGE("android:id/message"),
+    ANDROID_BUTTON1("android:id/button1"),
     TAPO_SMARTHOME_CLOSE_BTN("com.tplink.iot:id/close"),
-    TAPO_SMARTBULB_EDIT_PRESET_CLOSE_BTN("com.tplink.iot:id/iv_close"),
+    TAPO_SMARTBULB_EDIT_CLOSE_BTN("com.tplink.iot:id/iv_close"),
     TAPO_SMARTBULB_STATE_BTN("com.tplink.iot:id/bulb_switch"),
     TAPO_SMARTBULB_MASK_VIEW("com.tplink.iot:id/mask_view"),
     TAPO_SMARTBULB_PRESET_COLORS("com.tplink.iot:id/color_preset_view"),
@@ -95,6 +97,8 @@ enum class SmartObjTextSelector(val textLabel: String) {
     TAPO_FEEDBACK("Are you enjoying Tapo?"),
     EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_BULBS("Bulbs"),
     EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_PLUGS("Plugs"),
+    EZVIZ_SMARTPLUG_POPUP_TURNOFF_PLUG_MESSAGE("The device is working. It will stop working when disabled"),
+    EZVIZ_SMARTPLUG_DISABLE_TAG("Disable"),
     EZVIZ_FEEDBACK("Enjoying EZVIZ?")
 }
 
