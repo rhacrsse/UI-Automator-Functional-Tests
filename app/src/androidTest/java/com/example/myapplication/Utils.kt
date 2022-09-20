@@ -46,7 +46,7 @@ enum class SmartObjAppNames {
 
 enum class SmartObjDelays(val delay: Long) {
     DELAY_WINDOW(5000),
-    DELAY_ACTION(2000)
+    DELAY_ACTION(1000)
 }
 
 enum class SmartObjCoords(val startP: Pair<Int,Int>, val endP: Pair<Int,Int>) {

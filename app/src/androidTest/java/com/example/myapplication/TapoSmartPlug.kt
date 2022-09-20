@@ -39,7 +39,7 @@ class TapoSmartPlug (val device: UiDevice,
                     SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_ALL.textLabel))
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.printStackTrace()}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
             return 0
         }
 
@@ -50,7 +50,7 @@ class TapoSmartPlug (val device: UiDevice,
                     SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_PLUGS.textLabel))
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.printStackTrace()}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
             return 1
         }
 
@@ -76,7 +76,7 @@ class TapoSmartPlug (val device: UiDevice,
                 false -> turnOn()
             }
         } catch (e: Exception) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.printStackTrace()}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
         }
     }
 

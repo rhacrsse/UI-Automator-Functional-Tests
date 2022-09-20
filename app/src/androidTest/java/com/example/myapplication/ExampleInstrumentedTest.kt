@@ -47,10 +47,10 @@ class ExampleInstrumentedTest {
         val tapoSmartPlug = TapoSmartPlug(device=device, smartObjState=SmartObjStates.STATE_OFF)
         val ezvizSmartPlug = EzvizSmartPlug(device=device, smartObjState=SmartObjStates.STATE_OFF)
 
-        var nextpkgname: String = SmartObjPkgName.ANDROID.pkgName
+        var nextpkgname = SmartObjPkgName.ANDROID.pkgName
 
         // Log.i() TIMESTAMP(DATE TIME) APP ACTION
-        for (i in 1..50) {
+        for (i in 1..3000) {
             val st = System.currentTimeMillis()
             // per generare un evento ogni 60 secondi togliendo i delay dati dall'esecuzione degli eventi
             // andiamo a calcolare il tempo iniziale del ciclo e lo rapportiamo al tempo post esecuzione
@@ -88,7 +88,7 @@ class ExampleInstrumentedTest {
 
             // generare un evento ogni 60 s
             val et = System.currentTimeMillis()
-            //Thread.sleep((60000).minus(et.minus(st)))
+            Thread.sleep((60000).minus(et.minus(st)))
         }
     }
 }
