@@ -88,7 +88,7 @@ class ExampleInstrumentedTest {
 
             // generare un evento ogni 60 s
             val et = System.currentTimeMillis()
-            Thread.sleep((60000).minus(et.minus(st)))
+            Thread.sleep((SmartObjDelays.DELAY_EVENT.delay).minus(et.minus(st)))
         }
     }
 }

@@ -12,13 +12,14 @@ import java.time.format.DateTimeFormatter
  *
  * CONST DEFINITION
  *
+ * This class embodies variables, functions and parameters common to all the smart objects classes
+ *
  */
 
 /*
  *
  * NOTES
  * smartObjState => [ON|OFF]
- * navState      => [HOME|SMARTHOME|SMARTBULB|SMARTCAMERA|SMARTPLUG]
  * smartObjType  => [BULB|CAMERA|PLUG]
  * SmartObjAppName  => [Tapo|EZVIZ]
  *
@@ -30,10 +31,6 @@ enum class SmartObjStates(val state: Boolean) {
     STATE_OFF(false)
 }
 
-//enum class SmartObjNavStates {
-//    HOME, SMARTHOME, SMARTBULB, SMARTCAMERA, SMARTPLUG
-//}
-
 enum class SmartObjTypes(val type: String) {
     SMARTBULB("Smart Bulb"),
     SMARTPLUG("Smart Plug"),
@@ -41,12 +38,14 @@ enum class SmartObjTypes(val type: String) {
 }
 
 enum class SmartObjAppNames {
-    Tapo, EZVIZ
+    Tapo,
+    EZVIZ
 }
 
 enum class SmartObjDelays(val delay: Long) {
+    DELAY_EVENT(60000),
     DELAY_WINDOW(5000),
-    DELAY_ACTION(1000)
+    DELAY_ACTION(2000)
 }
 
 enum class SmartObjCoords(val startP: Pair<Int,Int>, val endP: Pair<Int,Int>) {
