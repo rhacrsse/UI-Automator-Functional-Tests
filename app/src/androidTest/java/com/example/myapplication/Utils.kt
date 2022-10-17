@@ -107,7 +107,7 @@ enum class SmartObjPkgName(val pkgName: String) {
     EZVIZ("com.ezviz")
 }
 
-val gtfile = "test_di_scrittura.txt"
+val gtfile = "gtfile.txt"
 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
 
 fun writeGroundTruthFile(sFileName: String, sBody: String){
@@ -116,18 +116,6 @@ fun writeGroundTruthFile(sFileName: String, sBody: String){
             if (!root.exists()) {
                 root.mkdirs()
             }
-
-            if (Files.notExists(Paths.get("/storage/emulated/0/Documents/Test1")))
-                Files.createDirectory(Paths.get("/storage/emulated/0/Documents/Test1"))
-
-            if (Files.notExists(Paths.get("/storage/emulated/0/Documents/Test2")))
-                Files.createDirectory(Paths.get("/storage/emulated/0/Documents/Test2"))
-
-            if (Files.notExists(Paths.get("/storage/emulated/0/Documents/Test1/test1.txt")))
-                Files.createFile(Paths.get("/storage/emulated/0/Documents/Test1/test1.txt"))
-
-            if (Files.notExists(Paths.get("/storage/emulated/0/Documents/Test2/test2.txt")))
-                Files.createFile(Paths.get("/storage/emulated/0/Documents/Test2/test2.txt"))
 
             val gpxfile = File(root, sFileName)
             when (gpxfile.exists()) {
@@ -148,3 +136,4 @@ fun getTimestamp(): String {
 }
 
 var SMARTOBJ_EVENT_NUMBER = 1
+var SMARTOBJ_EVENT_ITERS = 3000 // 1500 events are about 24 hours of test running
