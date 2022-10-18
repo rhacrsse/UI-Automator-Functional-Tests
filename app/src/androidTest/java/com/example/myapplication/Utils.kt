@@ -136,4 +136,4 @@ fun getTimestamp(): String {
 }
 
 var SMARTOBJ_EVENT_NUMBER = 1
-var SMARTOBJ_EVENT_ITERS = 3000 // 1500 events are about 24 hours of test running
+var SMARTOBJ_EVENT_ITERS = 1500 // 1500 events are about 24 hours of test running
