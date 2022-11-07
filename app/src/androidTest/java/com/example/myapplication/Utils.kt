@@ -1,5 +1,7 @@
+// PACKAGE NAME
 package com.example.myapplication
 
+// KOTLIN/JAVA LIBRARIES
 import android.os.Environment
 import java.io.File
 import java.io.IOException
@@ -16,38 +18,43 @@ import java.time.format.DateTimeFormatter
  *
  */
 
-/*
- *
- * NOTES
- * smartObjState => [ON|OFF]
- * smartObjType  => [BULB|CAMERA|PLUG]
- * SmartObjAppName  => [Tapo|EZVIZ]
- *
- */
-
-
+// Smart object states: on/off
 enum class SmartObjStates(val state: Boolean) {
     STATE_ON(true),
     STATE_OFF(false)
 }
 
+// Smart object types: In our scenario we had 2 types (bulbs and plugs), cameras have been defined for future works.
 enum class SmartObjTypes(val type: String) {
     SMARTBULB("Smart Bulb"),
     SMARTPLUG("Smart Plug"),
     SMARTCAMERA("Smart Camera")
 }
 
+// Android app delays defined between actions.
+enum class SmartObjDelays(val delay: Long) {
+    // It defines how often an event has to be generated (The value is expressed in ms).
+    DELAY_EVENT(60000),
+    // It defines how long the app need to wait/to freeze before performing an action inside a new opened screen window (The value is expressed in ms).
+    DELAY_WINDOW(5000),
+    // It defines how long the app need to wait/to freeze before performing another sequential action (The value is expressed in ms).
+    DELAY_ACTION(2000)
+}
+
+/*
+ * Android GUI elements selectors based upon elements text app name.
+ * The case depends on the values got from UIAutomatorviewer text diplayed and set by the developer of the apps.
+ */
 enum class SmartObjAppNames {
     Tapo,
     EZVIZ
 }
 
-enum class SmartObjDelays(val delay: Long) {
-    DELAY_EVENT(60000),
-    DELAY_WINDOW(5000),
-    DELAY_ACTION(2000)
-}
-
+/*
+ * Android GUI elements selectors based upon elements pixel bounds.
+ * From UIAutomatorviewer it has been extracted the pair points [top left coords (x1,y1), and bottom right coords (x2,y2)].
+ * e.g. EZVIZ_SMARTBULB_COLOR_BTN(Pair(x1,y1),Pair(x2,y2)) => EZVIZ_SMARTBULB_COLOR_BTN(Pair(39,256),Pair(155,371))    
+ */
 enum class SmartObjCoords(val startP: Pair<Int,Int>, val endP: Pair<Int,Int>) {
     EZVIZ_SMARTBULB_COLOR_BTN(Pair(39,256),Pair(155,371)),
     EZVIZ_SMARTBULB_COLOR_TEMPERATURE_BTN(Pair(181,256),Pair(297,371)),
@@ -55,6 +62,7 @@ enum class SmartObjCoords(val startP: Pair<Int,Int>, val endP: Pair<Int,Int>) {
     EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE(Pair(191,441),Pair(889,1139)),
 }
 
+// Android GUI elements selectors based upon class names.
 enum class SmartObjClassNames(val cn: String) {
     TAPO_ANDROID_VIEW("android.view.View"),
     EZVIZ_ANDROID_VIEWGROUP("android.view.ViewGroup"),
@@ -62,6 +70,7 @@ enum class SmartObjClassNames(val cn: String) {
     EZVIZ_ANDROID_FRAMELAYOUT("android.widget.FrameLayout")
 }
 
+// Android GUI elements selectors based upon unique resource identifiers.
 enum class SmartObjResourceIDs(val rid: String) {
     ANDROID_CONTENT("android:id/content"),
     ANDROID_MESSAGE("android:id/message"),
@@ -89,6 +98,7 @@ enum class SmartObjResourceIDs(val rid: String) {
     EZVIZ_SMARTHOME_EDIT_BRIGHT_SEEK_BAR("com.ezviz:id/seek_bar")
 }
 
+// Android GUI elements selectors based upon description text.
 enum class SmartObjTextSelector(val textLabel: String) {
     TAPO_SMARTHOME_FAVOURITES_ALL("ALL"),
     TAPO_SMARTHOME_FAVOURITES_BULBS("Smart Bulb"),
@@ -101,26 +111,33 @@ enum class SmartObjTextSelector(val textLabel: String) {
     EZVIZ_FEEDBACK("Enjoying EZVIZ?")
 }
 
+// Android GUI elements selectors based upon package names. 
 enum class SmartObjPkgName(val pkgName: String) {
     ANDROID("com.google.android.apps.nexuslauncher"),
     TAPO("com.tplink.iot"),
     EZVIZ("com.ezviz")
 }
 
+// Groundtruth log file name that will be written on the emulated android device storage.
 val gtfile = "gtfile.txt"
+
+// Groundtruth log file date format
 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
 
+// Function in charge of writing the groundtruth events in the log file.
 fun writeGroundTruthFile(sFileName: String, sBody: String){
         try {
+            // Environment.getExternalStorageDirectory() returns the path: /storage/emulated/0 .  
+            // Environment.DIRECTORY_DOCUMENTS returns Documents folder.
             val root = File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOCUMENTS)
-            if (!root.exists()) {
-                root.mkdirs()
-            }
 
-            val gpxfile = File(root, sFileName)
-            when (gpxfile.exists()) {
-                true  -> { gpxfile.appendText(sBody) }
-                false -> { gpxfile.createNewFile(); gpxfile.writeText(sBody) }
+            // The Path of the groundtruth log file is /storage/emulated/0/Documents/gtfile.txt .
+            val gtfile = File(root, sFileName)
+            when (gtfile.exists()) {
+                // if the file exissts, it will be appended the event.
+                true  -> { gtfile.appendText(sBody) }
+                // if the file does not exist, it will be created, and the first event row will be inserted.
+                false -> { gtfile.createNewFile(); gtfile.writeText(sBody) }
             }
         }
         catch(e: IOException)
@@ -129,11 +146,15 @@ fun writeGroundTruthFile(sFileName: String, sBody: String){
         }
 }
 
+// Function that gets the current time.
 fun getTimestamp(): String {
     val current = LocalDateTime.now()
 
     return current.format(formatter)
 }
 
+// Event counter
 var SMARTOBJ_EVENT_NUMBER = 1
-var SMARTOBJ_EVENT_ITERS = 1500 // 1500 events are about 24 hours of test running
+
+// Max events's number to be processed.
+var SMARTOBJ_EVENT_ITERS = 1440 // 1440 events are about 24 hours of test running generating 1 event every 60 seconds.

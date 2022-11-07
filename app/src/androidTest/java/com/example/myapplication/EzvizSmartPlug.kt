@@ -1,11 +1,19 @@
+// PACKAGE NAME
 package com.example.myapplication
 
+// KOTLIN/JAVA LIBRARIES
 import androidx.test.uiautomator.*
 
 /*
  *
- * class definition
+ * Ezviz Smart Plug Android application class definition.
+ * Tested with T31 smart device.
  *
+ * Each class has 4 attributes:
+ *   - device that is the selector of the emulated device interface to click.
+ *   - smartObjAppName is the const name of the app used for the smart object. "EZVIZ" is the const value in this case.
+ *   - smartObjType is const the name of the object manipulated by the class. "Smart Plug" is the const value in this case.
+ *   - smartObjState is the initial true state of the smart device.
  */
 class EzvizSmartPlug (val device: UiDevice,
                       private val smartObjAppName: String = SmartObjAppNames.EZVIZ.toString(),
