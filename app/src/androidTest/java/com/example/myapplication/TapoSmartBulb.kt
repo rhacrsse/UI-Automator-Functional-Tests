@@ -35,13 +35,33 @@ class TapoSmartBulb (val device: UiDevice,
     //                -> 2: Error encountered.
     private fun launchSmartApp(): Int {
         try {
-            // Select the Tapo app
-            val allAppsButton: UiObject = device.findObject(
-                UiSelector().description(
-                    smartObjAppName))
 
-            // Open the Tapo app
-            allAppsButton.clickAndWaitForNewWindow()
+            // Get the current package name that identifies the app currently opened on the Android Layout.
+            val currpkgname = device.currentPackageName
+            // Get the value of home view Android package name. 
+            val androidpkgname = SmartObjPkgName.ANDROID.pkgName
+            // Set the value of next package name to be opened to Tapo app package name. 
+            val nextpkgname = SmartObjPkgName.TAPO.pkgName
+
+            // Get back to home Android Layout if the previous event involved another App.
+            // The first condition assures that it is not pressed the home button if the view displayed is the Android home one.
+            // The second condition ensures that is is not pressed the home button if the view displayed is already the correct one,
+            // so we are already where we want to be, due to the previous event that has exploited the same App.
+            if (!currpkgname.equals(androidpkgname) && !currpkgname.equals(nextpkgname)) {
+                pressHomeButton()
+            }
+
+            // Open Tapo App if not yet.
+            if (!currpkgname.equals(nextpkgname)) {
+
+                // Select the Tapo app
+                val allAppsButton: UiObject = device.findObject(
+                    UiSelector().description(
+                        smartObjAppName))
+
+                // Open the Tapo app
+                allAppsButton.clickAndWaitForNewWindow()
+            }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
@@ -87,6 +107,11 @@ class TapoSmartBulb (val device: UiDevice,
     // Method that clicks the back button 
     private fun pressBackButton() {
         device.pressBack()
+    }
+
+    // Method that clicks the home button 
+    private fun pressHomeButton() {
+        device.pressHome()
     }
 
     // Method that controls the current state of the smart device
@@ -567,8 +592,8 @@ class TapoSmartBulb (val device: UiDevice,
                 /*
                  * APP TAPO TP-LINK GLITCH
                  * Bug workaround implemented to patch the inconsistencty when by default is focused the auto-compensate button and
-                 * it will be access by the first time the view selection of the AUTO modes.
-                 * This glitch switched OFF the bulb unexpectedly. It will be checked the Bulb status and in case is OFF, It will be switched ON, before going on.
+                 * it will be accessed by the first time the view of the AUTO modes.
+                 * This glitch switched OFF the bulb unexpectedly. It will be checked the Bulb status and in case it is OFF, It will be switched ON, before going on.
                  */
                 if (!device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTBULB_STATE_BTN.rid)).isChecked) { smartObjState = SmartObjStates.STATE_OFF; turnOn() }
                 
@@ -587,9 +612,10 @@ class TapoSmartBulb (val device: UiDevice,
     private fun enablePartyTheme() {
 
         try {
+            // Switch ON the bulb if it is OFF
             if (!checkBulbStatus()) turnOn()
 
-            // Click Theme button
+            // Click Theme button in the smart bulb view to access the Theme View
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
@@ -601,7 +627,7 @@ class TapoSmartBulb (val device: UiDevice,
         }
 
         try {
-            // Mode Direct - Party
+            // Click Mode Direct - Party button
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_DIRECT_PARTY_BTN.rid)).click()
@@ -611,7 +637,7 @@ class TapoSmartBulb (val device: UiDevice,
 
             setDelay(SmartObjDelays.DELAY_WINDOW.delay)
 
-            // Stop Party Mode
+            // Stop Mode Direct - Party after a number of seconds set by the previous setDelay(...) method.
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid)).click()
@@ -622,7 +648,7 @@ class TapoSmartBulb (val device: UiDevice,
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
         }
 
-        // Click exit btn
+        // Exit from the Theme View 
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
@@ -633,9 +659,10 @@ class TapoSmartBulb (val device: UiDevice,
     private fun enableRelaxTheme() {
 
         try {
+            // Switch ON the bulb if it is OFF
             if (!checkBulbStatus()) turnOn()
 
-            // Click Theme button
+            // Click Theme button in the smart bulb view to access the Theme View
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
@@ -647,7 +674,7 @@ class TapoSmartBulb (val device: UiDevice,
         }
 
         try {
-            // Mode Breath - Relax
+            // Click Mode Breath - Relax button
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BREATH_RELAX_BTN.rid))
@@ -658,7 +685,7 @@ class TapoSmartBulb (val device: UiDevice,
 
             setDelay(SmartObjDelays.DELAY_WINDOW.delay)
 
-            // Stop Relax Mode
+            // Stop Mode Breath - Relax after a number of seconds set by the previous setDelay(...) method.
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid)).click()
@@ -669,39 +696,58 @@ class TapoSmartBulb (val device: UiDevice,
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
         }
 
-        // Click exit btn
+        // Exit from the Theme View 
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
             .clickAndWaitForNewWindow()
     }
 
+    // Method used the get the center pair (x,y) pixels of a 2D figure given:
+    // - startP = starting pair point (x,y) pixels representing top left element bounds.
+    // - endP   = ending pair point (x,y) pixels representing bottom right element bounds.
     private fun getCenter(startP: Pair<Int,Int>, endP: Pair<Int,Int>): Pair<Int,Int> {
 
-        val hx = (endP.first).minus(startP.first).floorDiv(2)   // half x
-        val hy = (endP.second).minus(startP.second).floorDiv(2) // half y
+        // hx identifies half length of the 2D element inspected on x-axis
+        val hx = (endP.first).minus(startP.first).floorDiv(2)
+        // hy identifies half length of the 2D element inspected on y-axis
+        val hy = (endP.second).minus(startP.second).floorDiv(2)
 
+        // Center coords are being got by adding the 2 half lenghts to the starting point coords.
         val cenx = (startP.first).plus(hx)
         val ceny = (startP.second).plus(hy)
 
         return Pair(cenx,ceny)
     }
 
+    // Method that computes the radius of a disk (e.g. color picker)
     private fun getRadius(startP: Pair<Int,Int>, endP: Pair<Int,Int>): Int {
 
+        // The radius of a 2 element is equal to half its diameter.
+
+        // hx identifies half length of the 2D element inspected on x-axis
         val hx = (endP.first).minus(startP.first).floorDiv(2)   // half x
+        // hy identifies half length of the 2D element inspected on y-axis
         val hy = (endP.second).minus(startP.second).floorDiv(2) // half y
 
+        // It will be chosen the min between hx and hy considering the element squared. 
         return min(hx, hy)
     }
 
+    // Method to get a random point (identified by a pair of pixels x,y) inside a disk.
     private fun getRandomDiskCoords(startP: Pair<Int,Int>, endP: Pair<Int,Int>): Pair<Int,Int> {
+        // Calculate the center coords of the disk considered.
         val cencoords = getCenter(startP, endP)
+        // Get the radius.
         val rho = getRadius(startP, endP)
 
+        // Get random radius in the range [0,rho]. That is the upper bound value of the radius of our disk.
         val randomRho = SecureRandom().nextInt(rho).plus(1)
+        // Get random azimuth in the range [0,2*PI]
         val randomTheta = SecureRandom().nextDouble().times(2).times(PI)
 
+        // Get cartesian coords from polar ones.
+        // They represent the random point on which the cursor will be put.
         val randomx = randomRho.times(cos(randomTheta)).toInt()
         val randomy = randomRho.times(sin(randomTheta)).toInt()
 
@@ -720,18 +766,35 @@ class TapoSmartBulb (val device: UiDevice,
     // Method that manages the possible actions executable for the smart device selected randomly.
     fun selectRandomInstrumentedTest() {
 
-        // error launcher variable
-        var errl = 0
-        if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) errl = launchSmartApp()
+        // Get the current package name that identifies the app currently opened on the Android Layout.
+        //val currpkgname = device.currentPackageName
+        // Get the value of home view Android package name. 
+        //val androidpkgname = SmartObjPkgName.ANDROID.pkgName
+        // Set the value of next package name to be opened to Tapo app package name. 
+        //val nextpkgname = SmartObjPkgName.TAPO.pkgName
+
+        // 
+        //if (!currpkgname.equals(androidpkgname)
+        //     && !currpkgname.equals(nextpkgname)) errl = launchSmartApp()
+        //if (!nextpkgname.equals(currpkgname)) {device.pressHome(); errl = launchSmartApp()}
+        //if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) errl = launchSmartApp()
+
+        // Error launcher variable
+        // The meaning of the errl return code is explained in the launchSmartApp method.
+        var errl = launchSmartApp()
 
         if (errl == 0) {
+            // It is checked a possible popup view.
             checkPopUpFeedback()
 
-            // step view open smart plug variable
+            // Step view open smart plug variable
+            // The meaning of the stepv return code is explained in the openSmartBulb method.
             val stepv = openSmartBulb()
 
             if (stepv == 2) {
 
+                // SecureRandom().nextInt(9) -> random number in range [0, n-1] -> random number in range [0,8]
+                // SecureRandom().nextInt(9).plus(1) -> random number in range [1, 9]
                 val seed = SecureRandom().nextInt(9).plus(1)
 
                 when(seed) {
@@ -755,16 +818,21 @@ class TapoSmartBulb (val device: UiDevice,
     // Method that manages the possible actions executable for the smart device run sequentially.
     fun execSeqInstrumentedTest() {
 
-        // error launcher variable
-        var errl = 0
-        if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) errl = launchSmartApp()
+        //var errl = 0
+        //if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) errl = launchSmartApp()
+
+        // Error launcher variable
+        // The meaning of the errl return code is explained in the launchSmartApp method.
+        var errl = launchSmartApp()
 
         if (errl == 0) {
+            // It is checked a possible popup view.
             checkPopUpFeedback()
 
+            // Step view open smart plug variable
+            // The meaning of the stepv return code is explained in the openSmartBulb method.
             val stepv = openSmartBulb()
 
-            // step view open smart plug variable
             if (stepv == 2) {
                 increaseBrightSlider()
                 decreaseBrightSlider()

@@ -33,37 +33,42 @@ class ExampleInstrumentedTest {
         // Object that is an instance of EzvizSmartPlug.kt class
         val ezvizSmartPlug = EzvizSmartPlug(device=device, smartObjState=SmartObjStates.STATE_OFF)
 
-        var nextpkgname = SmartObjPkgName.ANDROID.pkgName
+        //var nextpkgname = SmartObjPkgName.ANDROID.pkgName
 
         // Loop that generates up to SMARTOBJ_EVENT_ITERS events
         for (i in 1..SMARTOBJ_EVENT_ITERS) {
             val st = System.currentTimeMillis()
 
-            val currpkgname = device.currentPackageName
+            //val currpkgname = device.currentPackageName
 
-            // SecureRandom returns a value between 0 and n-1
+            // SecureRandom().nextInt(4) -> random number in range [0, n-1] -> random number in range [0,3]
+            // SecureRandom().nextInt(4).plus(1) -> random number in range [1, 4]
+            //   - 1 is associated to Tapo  Smart Bulb L530U device
+            //   - 2 is associated to Ezviz Smart Bulb LB1   device
+            //   - 3 is associated to Tapo  Smart Plug P100  device
+            //   - 4 is associated to Ezviz Smart Plug T31   device
             val seed = SecureRandom().nextInt(4).plus(1)
 
             // Conditional statement that checks what is the next app to open.
             when (seed) {
                 1 -> {
-                    nextpkgname = SmartObjPkgName.TAPO.pkgName
-                    if (!nextpkgname.equals(currpkgname)) device.pressHome()
+                    //nextpkgname = SmartObjPkgName.TAPO.pkgName
+                    //if (!nextpkgname.equals(currpkgname)) device.pressHome()
                     tapoSmartBulb.selectRandomInstrumentedTest()
                 }
                 2 -> {
-                    nextpkgname = SmartObjPkgName.EZVIZ.pkgName
-                    if (!nextpkgname.equals(currpkgname)) device.pressHome()
+                    //nextpkgname = SmartObjPkgName.EZVIZ.pkgName
+                    //if (!nextpkgname.equals(currpkgname)) device.pressHome()
                     ezvizSmartBulb.selectRandomInstrumentedTest()
                 }
                 3 -> {
-                    nextpkgname = SmartObjPkgName.TAPO.pkgName
-                    if (!nextpkgname.equals(currpkgname)) device.pressHome()
+                    //nextpkgname = SmartObjPkgName.TAPO.pkgName
+                    //if (!nextpkgname.equals(currpkgname)) device.pressHome()
                     tapoSmartPlug.selectRandomInstrumentedTest()
                 }
                 4 -> {
-                    nextpkgname = SmartObjPkgName.EZVIZ.pkgName
-                    if (!nextpkgname.equals(currpkgname)) device.pressHome()
+                    //nextpkgname = SmartObjPkgName.EZVIZ.pkgName
+                    //if (!nextpkgname.equals(currpkgname)) device.pressHome()
                     ezvizSmartPlug.selectRandomInstrumentedTest()
                 }
             }

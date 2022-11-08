@@ -35,13 +35,33 @@ class TapoSmartPlug (val device: UiDevice,
     //                -> 2: Error encountered.
     private fun launchSmartApp(): Int {
         try {
-            // Select the Tapo app
-            val allAppsButton: UiObject = device.findObject(
-                UiSelector().description(
-                    smartObjAppName))
 
-            // Open the Tapo app
-            allAppsButton.clickAndWaitForNewWindow()
+            // Get the current package name that identifies the app currently opened on the Android Layout.
+            val currpkgname = device.currentPackageName
+            // Get the value of home view Android package name. 
+            val androidpkgname = SmartObjPkgName.ANDROID.pkgName
+            // Set the value of next package name to be opened to Tapo app package name. 
+            val nextpkgname = SmartObjPkgName.TAPO.pkgName
+
+            // Get back to home Android Layout if the previous event involved another App.
+            // The first condition assures that it is not pressed the home button if the view displayed is the Android home one.
+            // The second condition ensures that is is not pressed the home button if the view displayed is already the correct one,
+            // so we are already where we want to be, due to the previous event that has exploited the same App.
+            if (!currpkgname.equals(androidpkgname) && !currpkgname.equals(nextpkgname)) {
+                pressHomeButton()
+            }
+
+            // Open Tapo App if not yet.
+            if (!currpkgname.equals(nextpkgname)) {
+
+                // Select the Tapo app
+                val allAppsButton: UiObject = device.findObject(
+                    UiSelector().description(
+                        smartObjAppName))
+
+                // Open the Tapo app
+                allAppsButton.clickAndWaitForNewWindow()
+            }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
@@ -89,6 +109,11 @@ class TapoSmartPlug (val device: UiDevice,
         device.pressBack()
     }
 
+    // Method that clicks the home button 
+    private fun pressHomeButton() {
+        device.pressHome()
+    }
+
     // Method that controls the current state of the smart device
     private fun checkPlugStatus(): Boolean {
         return when(smartObjState){
@@ -115,10 +140,10 @@ class TapoSmartPlug (val device: UiDevice,
     // Method that turns on the smart device changing its state to ON.
     private fun turnOn() {
 
-        // click the button element on current view.
+        // Click the button element on current view.
         device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTPLUG_STATE_BTN.rid)).click()
 
-        // change the smartObjState class attribute to ON
+        // Change the smartObjState class attribute to ON
         smartObjState = SmartObjStates.STATE_ON
 
         // Groundtruth log file function writer.
@@ -161,14 +186,19 @@ class TapoSmartPlug (val device: UiDevice,
     // In this case the only action is to switch on/off the plug so selectRandomInstrumentedTest end execSeqInstrumentedTest have the identical behaviour.
     fun execSeqInstrumentedTest() {
 
-        // error launcher variable
-        var errl = 0
-        if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) errl = launchSmartApp()
+        //var errl = 0
+        //if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) errl = launchSmartApp()
+
+        // Error launcher variable
+        // The meaning of the errl return code is explained in the launchSmartApp method.
+        var errl = launchSmartApp()
 
         if (errl == 0) {
+            // It is checked a possible popup view.
             checkPopUpFeedback()
 
-            // step view open smart plug variable
+            // Step view open smart plug variable
+            // The meaning of the stepv return code is explained in the openSmartBulb method.
             val stepv = openSmartPlug()
 
             if (stepv == 2) {
