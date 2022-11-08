@@ -142,7 +142,7 @@ class TapoSmartBulb (val device: UiDevice,
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
-    // Method that increases the brightness of the bulb choosing the setting value randomly.
+    // Method that increases the brightness of the bulb choosing the value to set randomly.
     private fun increaseBrightSlider() {
 
         try {
@@ -170,7 +170,7 @@ class TapoSmartBulb (val device: UiDevice,
         }
     }
 
-    // Method that decreases the brightness of the bulb choosing the setting value randomly.
+    // Method that decreases the brightness of the bulb choosing the value to set randomly.
     private fun decreaseBrightSlider() {
 
         try {
@@ -198,59 +198,65 @@ class TapoSmartBulb (val device: UiDevice,
         }
     }
 
-    // Method that increases the color temperature of the bulb choosing the setting value randomly.
+    // Method that increases the color temperature of the bulb choosing the value to set randomly.
     private fun increaseColorTemperature() {
 
         try {
-            // switch ON the bulb if it is OFF
+            // Switch ON the bulb if it is OFF
             if (!checkBulbStatus()) turnOn()
 
-            // Select the slider element able to change the brightness
+            // Select the viewgroup element that includes the 7 preset colors 
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid
-                )
-            )
+                    SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid))
 
+            // Click on the blu preset color with index 2 the first time.
+            // The index 2 has been chosen arbitrarily. It could have been another one.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
-                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn
-                ).index(2)
-            )
+                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
+            // Click on the blu preset color with index 2 the second time.
+            // It is needed to click 2 times one of the preset colors in order to open the customization view where it is located the slider able to change the color temperature.
+            // Where are changing the default parameters associate to preset color chosen.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
-                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn
-                ).index(2)
-            )
+                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
         try {
-            // White Light
+            // Select the White Light tab that contains the slider.
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_BTN.rid))
                 .clickAndWaitForNewWindow()
 
+            // To increase the color temperature we move the slider downwards. In this way the value of the temperature (K) increases.
+            // SecureRandom().nextInt(3) -> random number in range [0, n-1] -> random number in range [0,2]
+            // SecureRandom().nextInt(3).plus(3) -> random number in range [2, 5]
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
                 .swipeDown(SecureRandom().nextInt(3).plus(3))
 
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Increase color temperature]\n")
 
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
         }
 
+        // Close the customization view of the blu with index 2 preset color, without saving any changes.
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
@@ -259,80 +265,96 @@ class TapoSmartBulb (val device: UiDevice,
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
-    // Method that decreases the color temperature of the bulb choosing the setting value randomly.
+    // Method that decreases the color temperature of the bulb choosing the value to set randomly.
     private fun decreaseColorTemperature() {
 
         try {
+            // Switch ON the bulb if it is OFF
             if (!checkBulbStatus()) turnOn()
 
+            // Select the viewgroup element that includes the 7 preset colors 
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid
-                )
-            )
+                    SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid))
 
+            // Click on the blu preset color with index 2 the first time.
+            // The index 2 has been chosen arbitrarily. It could have been another one.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
-                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn
-                ).index(2)
-            )
+                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
+            // Click on the blu preset color with index 2 the second time.
+            // It is needed to click 2 times one of the preset colors in order to open the customization view where it is located the slider able to change the color temperature.
+            // Where are changing the default parameters associate to preset color chosen.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
-                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn
-                ).index(2)
-            )
+                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
         try {
-            // White Light
+            // Select the White Light tab that contains the slider.
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_BTN.rid))
                 .clickAndWaitForNewWindow()
 
+            // To decrease the color temperature we move the slider upwards. In this way the value of the temperature [K] decreases.
+            // SecureRandom().nextInt(3) -> random number in range [0, n-1] -> random number in range [0,2]
+            // SecureRandom().nextInt(3).plus(3) -> random number in range [2, 5]
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
                 .swipeUp(SecureRandom().nextInt(3).plus(3))
 
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Decrease color temperature]\n")
 
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
         }
 
+        // Close the customization view of the blu with index 2 preset color, without saving any changes.
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
             .clickAndWaitForNewWindow()
+
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
-    // Method that changes the color hue of the bulb choosing the setting value randomly.
+    // Method that changes the color hue of the bulb choosing the value to set randomly.
     private fun editColor() {
 
         try {
+            // Switch ON the bulb if it is OFF
             if (!checkBulbStatus()) turnOn()
 
+            // Select the viewgroup element that includes the 7 preset colors 
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid))
 
+            // Click on the blu preset color with index 2 the first time.
+            // The index 2 has been chosen arbitrarily. It could have been another one.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
                     SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
+            // Click on the blu preset color with index 2 the second time.
+            // It is needed to click 2 times one of the preset colors in order to open the customization view where it is located the slider able to change the color temperature.
+            // Where are changing the default parameters associate to preset color chosen.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
                     SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
@@ -340,12 +362,13 @@ class TapoSmartBulb (val device: UiDevice,
 
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
         try {
-            // Color Light
+            // Select the Color Light tab that contains the slider.
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_BTN.rid))
@@ -353,28 +376,42 @@ class TapoSmartBulb (val device: UiDevice,
 
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
+            // Select the disk color picker element using its resource identifier.
             val basicselector = device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_COLOR_PICKER.rid))
 
-            // il numbero di step da eseguire e' scelto in modo casuale tra 1 e 10
+            // It is set arbitrarily a random number betwen 1 and 10 to set the steps of a for loop,
+            // in which it will selected a point inside the picker such that the color of the bulb changes.
+            // SecureRandom().nextInt(10) -> random number in range [0, n-1] -> random number in range [0,9]
+            // SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
             val maxStep = SecureRandom().nextInt(10).plus(1)
+
+            // The point inside the picker is identified by its pixels coordinates.
+            // It is computed the center point of the picker (cx1,cy1) using the top left and bottom right pixels bounds extracted from the basicSelector element above.
+            // From the center coords of the picker we add/sub a random number calculated exploiting a random radius (upper-bounded by the radius of the picker) and a random azimuth.
+            // In this way it has been obtained a random point inside the picker to select.
             for (i in 1..maxStep step 1) {
 
+                // Get the randomPair in which to move the cursor inside the picker.
                 val randomPair = getRandomDiskCoords(
                     Pair(basicselector.bounds.left, basicselector.bounds.top),
                     Pair(basicselector.bounds.right, basicselector.bounds.bottom))
 
+                // Click the random point got
                 device.click(randomPair.first,randomPair.second)
 
+                // Groundtruth log file function writer.
                 writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Edit color randomly]\n")
 
                 setDelay(SmartObjDelays.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
         }
 
+        // Close the customization view of the blu with index 2 preset color, without saving any changes.
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
@@ -383,69 +420,74 @@ class TapoSmartBulb (val device: UiDevice,
         setDelay(SmartObjDelays.DELAY_ACTION.delay)
     }
 
-    // Method that changes the color hue of the bulb choosing the setting value randomly among preset values.
+    // Method that changes the color hue of the bulb choosing the value to set randomly among preset values.
     private fun setPresetColor() {
 
         try {
+            // Switch ON the bulb if it is OFF
             if (!checkBulbStatus()) turnOn()
 
+            // Select the viewgroup element that includes the 7 preset colors 
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid))
 
-            // if random in [1,2] allora index = 0 altrimenti index = random - 2
-            // then if random == 1 sfrutto il controllo sotto per auto-compensate
-            // elif random == 2 sfrutto il controllo sotto per auto-match
-            //val colorMap = mapOf(
-            //    "auto-compensate" to 0,
-            //    "auto-match" to 0,
-            //    "white" to 1,
-            //    "blue" to 2,
-            //    "red" to 3,
-            //    "yellow" to 4,
-            //    "green" to 5,
-            //    "purple" to 6,
-            //    "cyan" to 7)
-
-            /*
-            RANDOM NUMBER
-                val auto-compensate = 1
-                val auto-match      = 2
-                val white           = 3
-                val blue            = 4
-                val red             = 5
-                val yellow          = 6
-                val green           = 7
-                val purple          = 8
-                val cyan            = 9
-
-            INDEX
-                val auto-compensate = 0
-                val auto-match      = 0
-                val white           = 1
-                val blue            = 2
-                val red             = 3
-                val yellow          = 4
-                val green           = 5
-                val purple          = 6
-                val cyan            = 7
-            */
-
-            var prevRandomNumber = 10
-            // il numbero di step da eseguire e' scelto in modo casuale tra 1 e 10
+            // It is set arbitrarily a random number betwen 1 and 10 to set the steps of a for loop,
+            // in which it will selected a different preset color changing the color hue of the bulb. 
+            // SecureRandom().nextInt(10) -> random number in range [0, n-1] -> random number in range [0,9]
+            // SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
             val maxStep = SecureRandom().nextInt(10).plus(1)
+
+            // variable that holds the previous value selected.
+            // It is used to avoid clicking in the next iteration the same preset color, otherwise it will be opened the customization view element.
+            var prevRandomNumber = 10
+
+            // Loop the change the color hue of the bulb maxStep times.
             for (i in 1..maxStep step 1) {
+                /*
+                 * The preset colors in the Tapo App for the bulb are 8.
+                 * They are identified by the idx variable that you find scrolling the code downwards.
+                 * Since the first preset color is AUTO and it has 2 sub-preset modes, it is needed to handle this situation.
+                 * In order to do that it has been create a second variable randomNumber that takes into account it. 
+                 * randomNumber variable splits the first variable AUTO in 2 so instead of having 8 elements it holds 9 ones.
+                 */
+
+                /*
+                 * -------------------
+                 * RANDOM NUMBER
+                 * -------------------
+                 * auto-compensate = 1
+                 * auto-match      = 2
+                 * white           = 3
+                 * blue            = 4
+                 * red             = 5
+                 * yellow          = 6
+                 * green           = 7
+                 * purple          = 8
+                 * cyan            = 9
+                 *
+                 * SecureRandom().nextInt(9) -> random number in range [0, n-1] -> random number in range [0,8]
+                 * SecureRandom().nextInt(9).plus(1) -> random number in range [1, 9]
+                 */
                 var randomNumber = SecureRandom().nextInt(9).plus(1)
 
-                // il nuovo valore casuale deve essere diverso dal precedente
-                // altrimenti produce un doppio click che apre la pagina di modifica
-                // del singolo colore predeferito che non ci interessa per questo test.
-                // In questo modo eliminiamo questo side effect della ripetizione dello stesso
-                // numbero causale per 2 volte consecutive.
+                /*
+                 *  This check is due to the possible scenario in which the randomNumber actually got is equal to the previous one.
+                 *  In this way, it has been clicked 2 times in a row the same preset color.
+                 *  Unfortunately doing so, it will be opened the customization view for that color.
+                 *  This is considered un unexpected behavioiur.
+                 *  In order to avoid this to happen, it has been controlled the randomNumber value got.
+                 *  If this value is equivalent to the previous one, we try to get another random value until a value
+                 * different from the previous one will bet got.
+                 *
+                 *  SecureRandom().nextInt(9) -> random number in range [0, n-1] -> random number in range [0,8]
+                 *  SecureRandom().nextInt(9).plus(1) -> random number in range [1, 9]
+                 */
                 while (prevRandomNumber == randomNumber) {
                     randomNumber = SecureRandom().nextInt(9).plus(1)
                 }
 
+                // PRESET COLOR NAME TO BE LOGGED IN GROUNDTRUTH FILE
                 val presetColor =
                     when(randomNumber) {
                         1 -> "auto-compensate"
@@ -460,16 +502,35 @@ class TapoSmartBulb (val device: UiDevice,
                         else -> "error"
                     }
 
-
+                /*
+                 * -------------------
+                 * INDEX
+                 * -------------------
+                 * auto-compensate = 0
+                 * auto-match      = 0
+                 * white           = 1
+                 * blue            = 2
+                 * red             = 3
+                 * yellow          = 4
+                 * green           = 5
+                 * purple          = 6
+                 * cyan            = 7
+                 */
                 val idx = when(randomNumber) {
                     1,2 -> 0
                     else -> randomNumber.minus(2)
                 }
 
+                // Click the preset color button
                 smartBulbPresetColors.getChild(UiSelector().className(SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(idx)).click()
 
                 setDelay(SmartObjDelays.DELAY_ACTION.delay)
 
+                /*
+                 * APP TAPO TP-LINK GLITCH
+                 * In case the preset mode AUTO associated to index 0 will be selected, it is necessary to handle a specific behaviour.
+                 * A view will be opened in order to select between AUTO-COMPENSATE and AUTO-MATCH mode based on the randomNumber value.
+                 */
                 try {
                     when(randomNumber) {
                         // auto-compensate
@@ -490,7 +551,8 @@ class TapoSmartBulb (val device: UiDevice,
                         }
                     }
 
-                    writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Set preset color $presetColor]\n")
+                    // Groundtruth log file function writer.
+                    writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Set preset color ${presetColor}]\n")
                 } catch (e: Exception) {
                     device.findObject(
                         UiSelector().resourceId(
@@ -502,16 +564,26 @@ class TapoSmartBulb (val device: UiDevice,
 
                 // Risoluzione bug che generava un'inconsistenza quando e' selezionato di default il bottone auto-compensate
                 // ed accediamo per la prima volta alla schermata di scelta tra auto-compensate e auto-match all'interno della window
+                /*
+                 * APP TAPO TP-LINK GLITCH
+                 * Bug workaround implemented to patch the inconsistencty when by default is focused the auto-compensate button and
+                 * it will be access by the first time the view selection of the AUTO modes.
+                 * This glitch switched OFF the bulb unexpectedly. It will be checked the Bulb status and in case is OFF, It will be switched ON, before going on.
+                 */
                 if (!device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTBULB_STATE_BTN.rid)).isChecked) { smartObjState = SmartObjStates.STATE_OFF; turnOn() }
+                
+                // It has been saved the current randomNumber for the next iteration of the for loop.
                 prevRandomNumber = randomNumber
 
                 setDelay(SmartObjDelays.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
         }
     }
 
+    // Method that activates the DIRECT - PARTY theme preset mode
     private fun enablePartyTheme() {
 
         try {
@@ -523,6 +595,7 @@ class TapoSmartBulb (val device: UiDevice,
                     SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
             return
         }
@@ -533,6 +606,7 @@ class TapoSmartBulb (val device: UiDevice,
                 UiSelector().resourceId(
                     SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_DIRECT_PARTY_BTN.rid)).click()
 
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Enable party theme]\n")
 
             setDelay(SmartObjDelays.DELAY_WINDOW.delay)
@@ -544,6 +618,7 @@ class TapoSmartBulb (val device: UiDevice,
 
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
         }
 
@@ -554,6 +629,7 @@ class TapoSmartBulb (val device: UiDevice,
             .clickAndWaitForNewWindow()
     }
 
+    // Method that activates the BREATH - RELAX theme preset mode
     private fun enableRelaxTheme() {
 
         try {
@@ -565,6 +641,7 @@ class TapoSmartBulb (val device: UiDevice,
                     SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
             return
         }
@@ -576,6 +653,7 @@ class TapoSmartBulb (val device: UiDevice,
                     SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BREATH_RELAX_BTN.rid))
                 .clickAndWaitForNewWindow()
 
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Enable relax theme]\n")
 
             setDelay(SmartObjDelays.DELAY_WINDOW.delay)
@@ -587,6 +665,7 @@ class TapoSmartBulb (val device: UiDevice,
 
             setDelay(SmartObjDelays.DELAY_ACTION.delay)
         } catch (e: Exception) {
+            // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
         }
 
