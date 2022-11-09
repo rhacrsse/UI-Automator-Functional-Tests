@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter
  */
 
 // Android GUI elements selectors based upon package names. 
-enum class SmartObjPkgName(val pkgName: String) {
+enum class SmartObjPkg(val pkgName: String) {
     ANDROID("com.google.android.apps.nexuslauncher"),
     TAPO("com.tplink.iot"),
     EZVIZ("com.ezviz")
@@ -36,31 +36,31 @@ enum class SmartObjState(val state: Boolean) {
 //   - Device type. 
 //   - Device model. 
 enum class SmartObjModel(val app: SmartObjApp, val dev: SmartObjDevice, val mod: String) {
-    L530E(SmartObjAppName.TAPO, SmartObjDevice.SMARTBULB, "L530E"),
-    LB1(SmartObjAppName.EZVIZ, SmartObjDevice.SMARTBULB, "LB1"),
-    P100(SmartObjAppName.TAPO, SmartObjDevice.SMARTPLUG, "P100"),
-    T31(SmartObjAppName.EZVIZ, SmartObjDevice.SMARTPLUG, "T31"),
-    C100(SmartObjAppName.EZVIZ, SmartObjDevice.SMARTCAMERA, "C100")
+    L530E(SmartObjApp.TAPO, SmartObjDevice.SMARTBULB, "L530E"),
+    LB1(SmartObjApp.EZVIZ, SmartObjDevice.SMARTBULB, "LB1"),
+    P100(SmartObjApp.TAPO, SmartObjDevice.SMARTPLUG, "P100"),
+    T31(SmartObjApp.EZVIZ, SmartObjDevice.SMARTPLUG, "T31"),
+    C100(SmartObjApp.EZVIZ, SmartObjDevice.SMARTCAMERA, "C100")
 }
 
 /*
  * Android GUI elements selectors based upon elements text app name.
  * The case depends on the values got from UIAutomatorviewer text diplayed and set by the developer of the apps.
  */
-private enum class SmartObjApp(val appName: String, val pkgName: SmartObjPkgName) {
-    TAPO("Tapo", SmartObjPkgName.TAPO),
-    EZVIZ("EZVIZ", SmartObjPkgName.EZVIZ),
+enum class SmartObjApp(val appName: String, val pkg: SmartObjPkg) {
+    TAPO("Tapo", SmartObjPkg.TAPO),
+    EZVIZ("EZVIZ", SmartObjPkg.EZVIZ),
 }
 
 // Smart object types: In our scenario we had 2 types (bulbs and plugs), cameras have been defined for future works.
-private enum class SmartObjDevice(val dev: String) {
+enum class SmartObjDevice(val dev: String) {
     SMARTBULB("Smart Bulb"),
     SMARTPLUG("Smart Plug"),
     SMARTCAMERA("Smart Camera")
 }
 
 // Android app delays defined between actions.
-private enum class SmartObjDelay(val delay: Long) {
+enum class SmartObjDelay(val delay: Long) {
     // It defines how often an event has to be generated (The value is expressed in ms).
     DELAY_EVENT(60000),
     // It defines how long the app need to wait/to freeze before performing an action inside a new opened screen window (The value is expressed in ms).

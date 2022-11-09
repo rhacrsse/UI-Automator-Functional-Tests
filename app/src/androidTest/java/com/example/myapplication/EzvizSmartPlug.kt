@@ -35,9 +35,9 @@ class EzvizSmartPlug (private val device: UiDevice,
             // Get the current package name that identifies the app currently opened on the Android Layout.
             val currpkgname = device.currentPackageName
             // Get the value of home view Android package name. 
-            val androidpkgname = SmartObjPkgName.ANDROID.pkgName
+            val androidpkgname = SmartObjPkg.ANDROID.pkgName
             // Set the value of next package name to be opened to EZVIZ app package name. 
-            val nextpkgname = obj.app.pkgName
+            val nextpkgname = obj.app.pkg.pkgName
 
             // Get back to home Android Layout if the previous event involved another App.
             // The first condition assures that it is not pressed the home button if the view displayed is the Android home one.
@@ -60,7 +60,7 @@ class EzvizSmartPlug (private val device: UiDevice,
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
             return 2
         }
 
@@ -98,7 +98,7 @@ class EzvizSmartPlug (private val device: UiDevice,
         try {
             selectSmartPlugTab()
         } catch (e: Exception) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
@@ -109,7 +109,7 @@ class EzvizSmartPlug (private val device: UiDevice,
                 false -> turnOn()
             }
         } catch (e: Exception) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
         }
     }
 
@@ -123,7 +123,7 @@ class EzvizSmartPlug (private val device: UiDevice,
         objState = SmartObjState.STATE_ON
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Turn ON plug]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Turn ON plug]\n")
 
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
@@ -145,7 +145,7 @@ class EzvizSmartPlug (private val device: UiDevice,
         objState = SmartObjState.STATE_OFF
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Turn OFF plug]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Turn OFF plug]\n")
 
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
@@ -173,7 +173,7 @@ class EzvizSmartPlug (private val device: UiDevice,
 
         // Error launcher variable
         // The meaning of the errl return code is explained in the launchSmartApp method.
-        var errl = launchSmartApp()
+        val errl = launchSmartApp()
 
         if (errl == 0) {
             // It is checked a possible popup view.

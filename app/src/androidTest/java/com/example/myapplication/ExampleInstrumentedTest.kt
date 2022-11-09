@@ -22,16 +22,16 @@ class ExampleInstrumentedTest {
         val device: UiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         // Object that is an instance of TapoSmartBulb.kt class L530E model.
-        val tapoSmartBulb = TapoSmartBulb(device=device, smartObjState=SmartObjStates.STATE_OFF)
+        val tapoSmartBulb = TapoSmartBulb(device=device, objState=SmartObjState.STATE_OFF)
 
         // Object that is an instance of EzvizSmartBulb.kt class LB1 model.
-        val ezvizSmartBulb = EzvizSmartBulb(device=device, smartObjState=SmartObjStates.STATE_OFF)
+        val ezvizSmartBulb = EzvizSmartBulb(device=device, objState=SmartObjState.STATE_OFF)
 
         // Object that is an instance of TapoSmartPlug.kt class P100 model.
-        val tapoSmartPlug = TapoSmartPlug(device=device, smartObjState=SmartObjStates.STATE_OFF)
+        val tapoSmartPlug = TapoSmartPlug(device=device, objState=SmartObjState.STATE_OFF)
 
         // Object that is an instance of EzvizSmartPlug.kt class T31 model.
-        val ezvizSmartPlug = EzvizSmartPlug(device=device, smartObjState=SmartObjStates.STATE_OFF)
+        val ezvizSmartPlug = EzvizSmartPlug(device=device, objState=SmartObjState.STATE_OFF)
 
         //var nextpkgname = SmartObjPkgName.ANDROID.pkgName
 
@@ -81,7 +81,7 @@ class ExampleInstrumentedTest {
             // This variables is set in Utils.kt file. Now is value is 60 s, so
             // we are generating one event every 60 seconds give or take.
             // In order to do so we subtract execution delays of intermediate actions between events.
-            Thread.sleep((SmartObjDelays.DELAY_EVENT.delay).minus(et.minus(st)))
+            Thread.sleep((SmartObjDelay.DELAY_EVENT.delay).minus(et.minus(st)))
         }
     }
 }
