@@ -12,18 +12,19 @@ import kotlin.math.sin
 /*
  *
  * Tapo Tp-Link Smart Bulb Android application class definition.
- * Tested with L530U smart device.
+ * Tested with L530E smart device.
  *
- * Each class has 4 attributes:
+ * Each class has 3 attributes:
  *   - device that is the selector of the emulated device interface to click.
- *   - smartObjAppName is the const name of the app used for the smart object. "Tapo" is the const value in this case.
- *   - smartObjType is const the name of the object manipulated by the class. "Smart Bulb" is the const value in this case.
- *   - smartObjState is the initial true state of the smart device.
+ *   - obj that is the container of:
+ *     - smart object android app name and smart object android app package name.
+ *     - smart object device type.
+ *     - smart object device model.
+ *   - objState that is the current real state of the smart object. Set it accordingly when instantiating the kotlin object.
  */
-class TapoSmartBulb (val device: UiDevice,
-                     private val smartObjAppName: String = SmartObjAppNames.Tapo.toString(),
-                     private val smartObjType: String = SmartObjTypes.SMARTBULB.type,
-                     private var smartObjState: SmartObjStates = SmartObjStates.STATE_ON) {
+class TapoSmartBulb (private val device: UiDevice,
+                     private val obj: SmartObjModel = SmartObjModel.L530E,
+                     private var objState: SmartObjState = SmartObjState.STATE_ON) {
 
     // Method that set the delay between actions
     private fun setDelay(delay: Long) {
@@ -41,7 +42,7 @@ class TapoSmartBulb (val device: UiDevice,
             // Get the value of home view Android package name. 
             val androidpkgname = SmartObjPkgName.ANDROID.pkgName
             // Set the value of next package name to be opened to Tapo app package name. 
-            val nextpkgname = SmartObjPkgName.TAPO.pkgName
+            val nextpkgname = obj.app.pkgName
 
             // Get back to home Android Layout if the previous event involved another App.
             // The first condition assures that it is not pressed the home button if the view displayed is the Android home one.
@@ -57,14 +58,14 @@ class TapoSmartBulb (val device: UiDevice,
                 // Select the Tapo app
                 val allAppsButton: UiObject = device.findObject(
                     UiSelector().description(
-                        smartObjAppName))
+                        obj.app.appName))
 
                 // Open the Tapo app
                 allAppsButton.clickAndWaitForNewWindow()
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return 2
         }
 
@@ -85,7 +86,7 @@ class TapoSmartBulb (val device: UiDevice,
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return 0
         }
 
@@ -97,7 +98,7 @@ class TapoSmartBulb (val device: UiDevice,
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return 1
         }
 
@@ -116,9 +117,9 @@ class TapoSmartBulb (val device: UiDevice,
 
     // Method that controls the current state of the smart device
     private fun checkBulbStatus(): Boolean {
-        return when(smartObjState){
-            SmartObjStates.STATE_ON  -> SmartObjStates.STATE_ON.state
-            SmartObjStates.STATE_OFF -> SmartObjStates.STATE_OFF.state
+        return when(objState){
+            SmartObjState.STATE_ON  -> SmartObjState.STATE_ON.state
+            SmartObjState.STATE_OFF -> SmartObjState.STATE_OFF.state
         }
     }
 
@@ -133,7 +134,7 @@ class TapoSmartBulb (val device: UiDevice,
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
     }
 
@@ -141,30 +142,30 @@ class TapoSmartBulb (val device: UiDevice,
     private fun turnOn() {
 
         // click the button element on current view.
-        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTBULB_STATE_BTN.rid)).click()
+        device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTBULB_STATE_BTN.rid)).click()
 
-        // change the smartObjState class attribute to ON
-        smartObjState = SmartObjStates.STATE_ON
+        // change the objState class attribute to ON
+        objState = SmartObjState.STATE_ON
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Turn ON bulb]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Turn ON bulb]\n")
 
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that turns on the smart device changing its state to OFF.
     private fun turnOff() {
 
         // click the button element on current view.
-        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTBULB_STATE_BTN.rid)).click()
+        device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTBULB_STATE_BTN.rid)).click()
 
-        // change the smartObjState class attribute to OFF
-        smartObjState = SmartObjStates.STATE_OFF
+        // change the objState class attribute to OFF
+        objState = SmartObjState.STATE_OFF
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Turn OFF bulb]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Turn OFF bulb]\n")
 
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that increases the brightness of the bulb choosing the value to set randomly.
@@ -178,7 +179,7 @@ class TapoSmartBulb (val device: UiDevice,
             val smartBulbBrightness =
                 device.findObject(
                     UiSelector().resourceId(
-                        SmartObjResourceIDs.TAPO_SMARTBULB_MASK_VIEW.rid))
+                        SmartObjResourceId.TAPO_SMARTBULB_MASK_VIEW.rid))
 
             // change the brightness moving the slider upwards choosing a random number between 2 and 12
             // SecureRandom().nextInt(11) -> random number in range [0, n-1] -> random number in range [0,10]
@@ -186,12 +187,12 @@ class TapoSmartBulb (val device: UiDevice,
             smartBulbBrightness.swipeUp(SecureRandom().nextInt(11).plus(2))
 
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Increase brightness]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Increase brightness]\n")
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
     }
 
@@ -206,7 +207,7 @@ class TapoSmartBulb (val device: UiDevice,
             val smartBulbBrightness =
                 device.findObject(
                     UiSelector().resourceId(
-                        SmartObjResourceIDs.TAPO_SMARTBULB_MASK_VIEW.rid))
+                        SmartObjResourceId.TAPO_SMARTBULB_MASK_VIEW.rid))
 
             // change the brightness moving the slider downwards choosing a random number between 2 and 12
             // SecureRandom().nextInt(11) -> random number in range [0, n-1] -> random number in range [0,10]
@@ -214,12 +215,12 @@ class TapoSmartBulb (val device: UiDevice,
             smartBulbBrightness.swipeDown(SecureRandom().nextInt(11).plus(2))
 
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Decrease brightness]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Decrease brightness]\n")
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
     }
 
@@ -233,13 +234,13 @@ class TapoSmartBulb (val device: UiDevice,
             // Select the viewgroup element that includes the 7 preset colors 
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
 
             // Click on the blu preset color with index 2 the first time.
             // The index 2 has been chosen arbitrarily. It could have been another one.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
-                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
+                    SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
             // Click on the blu preset color with index 2 the second time.
@@ -247,13 +248,13 @@ class TapoSmartBulb (val device: UiDevice,
             // Where are changing the default parameters associate to preset color chosen.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
-                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
+                    SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
@@ -261,7 +262,7 @@ class TapoSmartBulb (val device: UiDevice,
             // Select the White Light tab that contains the slider.
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_BTN.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_BTN.rid))
                 .clickAndWaitForNewWindow()
 
             // To increase the color temperature we move the slider downwards. In this way the value of the temperature (K) increases.
@@ -269,25 +270,25 @@ class TapoSmartBulb (val device: UiDevice,
             // SecureRandom().nextInt(3).plus(3) -> random number in range [2, 5]
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
                 .swipeDown(SecureRandom().nextInt(3).plus(3))
 
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Increase color temperature]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Increase color temperature]\n")
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
 
         // Close the customization view of the blu with index 2 preset color, without saving any changes.
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
+                SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
             .clickAndWaitForNewWindow()
 
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that decreases the color temperature of the bulb choosing the value to set randomly.
@@ -300,13 +301,13 @@ class TapoSmartBulb (val device: UiDevice,
             // Select the viewgroup element that includes the 7 preset colors 
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
 
             // Click on the blu preset color with index 2 the first time.
             // The index 2 has been chosen arbitrarily. It could have been another one.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
-                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
+                    SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
             // Click on the blu preset color with index 2 the second time.
@@ -314,13 +315,13 @@ class TapoSmartBulb (val device: UiDevice,
             // Where are changing the default parameters associate to preset color chosen.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
-                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
+                    SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
@@ -328,7 +329,7 @@ class TapoSmartBulb (val device: UiDevice,
             // Select the White Light tab that contains the slider.
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_BTN.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_BTN.rid))
                 .clickAndWaitForNewWindow()
 
             // To decrease the color temperature we move the slider upwards. In this way the value of the temperature [K] decreases.
@@ -336,26 +337,26 @@ class TapoSmartBulb (val device: UiDevice,
             // SecureRandom().nextInt(3).plus(3) -> random number in range [2, 5]
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_COLOR_TEMPERATURE.rid))
                 .swipeUp(SecureRandom().nextInt(3).plus(3))
 
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Decrease color temperature]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Decrease color temperature]\n")
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
 
         // Close the customization view of the blu with index 2 preset color, without saving any changes.
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
+                SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
             .clickAndWaitForNewWindow()
 
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that changes the color hue of the bulb choosing the value to set randomly.
@@ -368,13 +369,13 @@ class TapoSmartBulb (val device: UiDevice,
             // Select the viewgroup element that includes the 7 preset colors 
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
 
             // Click on the blu preset color with index 2 the first time.
             // The index 2 has been chosen arbitrarily. It could have been another one.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
-                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
+                    SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
             // Click on the blu preset color with index 2 the second time.
@@ -382,13 +383,13 @@ class TapoSmartBulb (val device: UiDevice,
             // Where are changing the default parameters associate to preset color chosen.
             smartBulbPresetColors.getChild(
                 UiSelector().className(
-                    SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(2))
+                    SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
@@ -396,15 +397,15 @@ class TapoSmartBulb (val device: UiDevice,
             // Select the Color Light tab that contains the slider.
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_BTN.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_BTN.rid))
                 .clickAndWaitForNewWindow()
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
             // Select the disk color picker element using its resource identifier.
             val basicselector = device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_COLOR_PICKER.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_COLOR_PICKER.rid))
 
             // It is set arbitrarily a random number betwen 1 and 10 to set the steps of a for loop,
             // in which it will selected a point inside the picker such that the color of the bulb changes.
@@ -427,22 +428,22 @@ class TapoSmartBulb (val device: UiDevice,
                 device.click(randomPair.first,randomPair.second)
 
                 // Groundtruth log file function writer.
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Edit color randomly]\n")
+                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Edit color randomly]\n")
 
-                setDelay(SmartObjDelays.DELAY_ACTION.delay)
+                setDelay(SmartObjDelay.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
 
         // Close the customization view of the blu with index 2 preset color, without saving any changes.
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
+                SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
             .clickAndWaitForNewWindow()
 
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that changes the color hue of the bulb choosing the value to set randomly among preset values.
@@ -455,7 +456,7 @@ class TapoSmartBulb (val device: UiDevice,
             // Select the viewgroup element that includes the 7 preset colors 
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_COLORS.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
 
             // It is set arbitrarily a random number betwen 1 and 10 to set the steps of a for loop,
             // in which it will selected a different preset color changing the color hue of the bulb. 
@@ -547,9 +548,9 @@ class TapoSmartBulb (val device: UiDevice,
                 }
 
                 // Click the preset color button
-                smartBulbPresetColors.getChild(UiSelector().className(SmartObjClassNames.TAPO_ANDROID_VIEW.cn).index(idx)).click()
+                smartBulbPresetColors.getChild(UiSelector().className(SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(idx)).click()
 
-                setDelay(SmartObjDelays.DELAY_ACTION.delay)
+                setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
                 /*
                  * APP TAPO TP-LINK GLITCH
@@ -562,29 +563,29 @@ class TapoSmartBulb (val device: UiDevice,
                         1 -> {
                             device.findObject(
                                 UiSelector().resourceId(
-                                    SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_AUTO_COMPENSATE_MODE.rid))
+                                    SmartObjResourceId.TAPO_SMARTBULB_PRESET_AUTO_COMPENSATE_MODE.rid))
                                 .clickAndWaitForNewWindow()
-                            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+                            setDelay(SmartObjDelay.DELAY_ACTION.delay)
                         }
                         // auto-match
                         2 -> {
                             device.findObject(
                                 UiSelector().resourceId(
-                                    SmartObjResourceIDs.TAPO_SMARTBULB_PRESET_AUTO_MATCH_MODE.rid))
+                                    SmartObjResourceId.TAPO_SMARTBULB_PRESET_AUTO_MATCH_MODE.rid))
                                 .clickAndWaitForNewWindow()
-                            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+                            setDelay(SmartObjDelay.DELAY_ACTION.delay)
                         }
                     }
 
                     // Groundtruth log file function writer.
-                    writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Set preset color ${presetColor}]\n")
+                    writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Set preset color ${presetColor}]\n")
                 } catch (e: Exception) {
                     device.findObject(
                         UiSelector().resourceId(
-                            SmartObjResourceIDs.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
+                            SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
                         .clickAndWaitForNewWindow()
 
-                    setDelay(SmartObjDelays.DELAY_ACTION.delay)
+                    setDelay(SmartObjDelay.DELAY_ACTION.delay)
                 }
 
                 // Risoluzione bug che generava un'inconsistenza quando e' selezionato di default il bottone auto-compensate
@@ -595,16 +596,16 @@ class TapoSmartBulb (val device: UiDevice,
                  * it will be accessed by the first time the view of the AUTO modes.
                  * This glitch switched OFF the bulb unexpectedly. It will be checked the Bulb status and in case it is OFF, It will be switched ON, before going on.
                  */
-                if (!device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTBULB_STATE_BTN.rid)).isChecked) { smartObjState = SmartObjStates.STATE_OFF; turnOn() }
+                if (!device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTBULB_STATE_BTN.rid)).isChecked) { objState = SmartObjState.STATE_OFF; turnOn() }
                 
                 // It has been saved the current randomNumber for the next iteration of the for loop.
                 prevRandomNumber = randomNumber
 
-                setDelay(SmartObjDelays.DELAY_ACTION.delay)
+                setDelay(SmartObjDelay.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
     }
 
@@ -618,11 +619,11 @@ class TapoSmartBulb (val device: UiDevice,
             // Click Theme button in the smart bulb view to access the Theme View
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
@@ -630,28 +631,28 @@ class TapoSmartBulb (val device: UiDevice,
             // Click Mode Direct - Party button
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_DIRECT_PARTY_BTN.rid)).click()
+                    SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_DIRECT_PARTY_BTN.rid)).click()
 
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Enable party theme]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Enable party theme]\n")
 
-            setDelay(SmartObjDelays.DELAY_WINDOW.delay)
+            setDelay(SmartObjDelay.DELAY_WINDOW.delay)
 
             // Stop Mode Direct - Party after a number of seconds set by the previous setDelay(...) method.
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid)).click()
+                    SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid)).click()
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
 
         // Exit from the Theme View 
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
+                SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
             .clickAndWaitForNewWindow()
     }
 
@@ -665,11 +666,11 @@ class TapoSmartBulb (val device: UiDevice,
             // Click Theme button in the smart bulb view to access the Theme View
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
@@ -677,29 +678,29 @@ class TapoSmartBulb (val device: UiDevice,
             // Click Mode Breath - Relax button
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BREATH_RELAX_BTN.rid))
+                    SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BREATH_RELAX_BTN.rid))
                 .clickAndWaitForNewWindow()
 
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: Enable relax theme]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Enable relax theme]\n")
 
-            setDelay(SmartObjDelays.DELAY_WINDOW.delay)
+            setDelay(SmartObjDelay.DELAY_WINDOW.delay)
 
             // Stop Mode Breath - Relax after a number of seconds set by the previous setDelay(...) method.
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid)).click()
+                    SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid)).click()
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
 
         // Exit from the Theme View 
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
+                SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
             .clickAndWaitForNewWindow()
     }
 
@@ -759,7 +760,7 @@ class TapoSmartBulb (val device: UiDevice,
         // Check if the popup is on view
         if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
             // Closing Popup window
-            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
+            device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
         }
     }
 
@@ -771,13 +772,13 @@ class TapoSmartBulb (val device: UiDevice,
         // Get the value of home view Android package name. 
         //val androidpkgname = SmartObjPkgName.ANDROID.pkgName
         // Set the value of next package name to be opened to Tapo app package name. 
-        //val nextpkgname = SmartObjPkgName.TAPO.pkgName
+        //val nextpkgname = obj.app.pkgName
 
         // 
         //if (!currpkgname.equals(androidpkgname)
         //     && !currpkgname.equals(nextpkgname)) errl = launchSmartApp()
         //if (!nextpkgname.equals(currpkgname)) {device.pressHome(); errl = launchSmartApp()}
-        //if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) errl = launchSmartApp()
+        //if (!device.currentPackageName.equals(obj.app.pkgName)) errl = launchSmartApp()
 
         // Error launcher variable
         // The meaning of the errl return code is explained in the launchSmartApp method.
@@ -819,7 +820,7 @@ class TapoSmartBulb (val device: UiDevice,
     fun execSeqInstrumentedTest() {
 
         //var errl = 0
-        //if (!device.currentPackageName.equals(SmartObjPkgName.TAPO.pkgName)) errl = launchSmartApp()
+        //if (!device.currentPackageName.equals(obj.app.pkgName)) errl = launchSmartApp()
 
         // Error launcher variable
         // The meaning of the errl return code is explained in the launchSmartApp method.

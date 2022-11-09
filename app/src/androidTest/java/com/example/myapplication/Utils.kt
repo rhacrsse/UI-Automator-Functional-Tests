@@ -18,21 +18,49 @@ import java.time.format.DateTimeFormatter
  *
  */
 
+// Android GUI elements selectors based upon package names. 
+enum class SmartObjPkgName(val pkgName: String) {
+    ANDROID("com.google.android.apps.nexuslauncher"),
+    TAPO("com.tplink.iot"),
+    EZVIZ("com.ezviz")
+}
+
 // Smart object states: on/off
-enum class SmartObjStates(val state: Boolean) {
+enum class SmartObjState(val state: Boolean) {
     STATE_ON(true),
     STATE_OFF(false)
 }
 
+// Smart object Model: Is is the union of 3 elements:
+//   - App used and package name of the app used. 
+//   - Device type. 
+//   - Device model. 
+enum class SmartObjModel(val app: SmartObjApp, val dev: SmartObjDevice, val mod: String) {
+    L530E(SmartObjAppName.TAPO, SmartObjDevice.SMARTBULB, "L530E"),
+    LB1(SmartObjAppName.EZVIZ, SmartObjDevice.SMARTBULB, "LB1"),
+    P100(SmartObjAppName.TAPO, SmartObjDevice.SMARTPLUG, "P100"),
+    T31(SmartObjAppName.EZVIZ, SmartObjDevice.SMARTPLUG, "T31"),
+    C100(SmartObjAppName.EZVIZ, SmartObjDevice.SMARTCAMERA, "C100")
+}
+
+/*
+ * Android GUI elements selectors based upon elements text app name.
+ * The case depends on the values got from UIAutomatorviewer text diplayed and set by the developer of the apps.
+ */
+private enum class SmartObjApp(val appName: String, val pkgName: SmartObjPkgName) {
+    TAPO("Tapo", SmartObjPkgName.TAPO),
+    EZVIZ("EZVIZ", SmartObjPkgName.EZVIZ),
+}
+
 // Smart object types: In our scenario we had 2 types (bulbs and plugs), cameras have been defined for future works.
-enum class SmartObjTypes(val type: String) {
+private enum class SmartObjDevice(val dev: String) {
     SMARTBULB("Smart Bulb"),
     SMARTPLUG("Smart Plug"),
     SMARTCAMERA("Smart Camera")
 }
 
 // Android app delays defined between actions.
-enum class SmartObjDelays(val delay: Long) {
+private enum class SmartObjDelay(val delay: Long) {
     // It defines how often an event has to be generated (The value is expressed in ms).
     DELAY_EVENT(60000),
     // It defines how long the app need to wait/to freeze before performing an action inside a new opened screen window (The value is expressed in ms).
@@ -42,20 +70,11 @@ enum class SmartObjDelays(val delay: Long) {
 }
 
 /*
- * Android GUI elements selectors based upon elements text app name.
- * The case depends on the values got from UIAutomatorviewer text diplayed and set by the developer of the apps.
- */
-enum class SmartObjAppNames {
-    Tapo,
-    EZVIZ
-}
-
-/*
  * Android GUI elements selectors based upon elements pixel bounds.
  * From UIAutomatorviewer it has been extracted the pair points [top left coords (x1,y1), and bottom right coords (x2,y2)].
  * e.g. EZVIZ_SMARTBULB_COLOR_BTN(Pair(x1,y1),Pair(x2,y2)) => EZVIZ_SMARTBULB_COLOR_BTN(Pair(39,256),Pair(155,371))    
  */
-enum class SmartObjCoords(val startP: Pair<Int,Int>, val endP: Pair<Int,Int>) {
+enum class SmartObjCoord(val startP: Pair<Int,Int>, val endP: Pair<Int,Int>) {
     EZVIZ_SMARTBULB_COLOR_BTN(Pair(39,256),Pair(155,371)),
     EZVIZ_SMARTBULB_COLOR_TEMPERATURE_BTN(Pair(181,256),Pair(297,371)),
     EZVIZ_SMARTBULB_MODES_BTN(Pair(323,256),Pair(438,371)),
@@ -63,7 +82,7 @@ enum class SmartObjCoords(val startP: Pair<Int,Int>, val endP: Pair<Int,Int>) {
 }
 
 // Android GUI elements selectors based upon class names.
-enum class SmartObjClassNames(val cn: String) {
+enum class SmartObjClassName(val cn: String) {
     TAPO_ANDROID_VIEW("android.view.View"),
     EZVIZ_ANDROID_VIEWGROUP("android.view.ViewGroup"),
     EZVIZ_ANDROID_SCROLLVIEW("android.widget.ScrollView"),
@@ -71,7 +90,7 @@ enum class SmartObjClassNames(val cn: String) {
 }
 
 // Android GUI elements selectors based upon unique resource identifiers.
-enum class SmartObjResourceIDs(val rid: String) {
+enum class SmartObjResourceId(val rid: String) {
     ANDROID_CONTENT("android:id/content"),
     ANDROID_MESSAGE("android:id/message"),
     ANDROID_BUTTON1("android:id/button1"),
@@ -109,13 +128,6 @@ enum class SmartObjTextSelector(val textLabel: String) {
     EZVIZ_SMARTPLUG_POPUP_TURNOFF_PLUG_MESSAGE("The device is working. It will stop working when disabled"),
     EZVIZ_SMARTPLUG_DISABLE_TAG("Disable"),
     EZVIZ_FEEDBACK("Enjoying EZVIZ?")
-}
-
-// Android GUI elements selectors based upon package names. 
-enum class SmartObjPkgName(val pkgName: String) {
-    ANDROID("com.google.android.apps.nexuslauncher"),
-    TAPO("com.tplink.iot"),
-    EZVIZ("com.ezviz")
 }
 
 // Groundtruth log file name that will be written on the emulated android device storage.

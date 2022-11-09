@@ -9,17 +9,17 @@ import androidx.test.uiautomator.*
  * Ezviz Smart Plug Android application class definition.
  * Tested with T31 smart device.
  *
- * Each class has 4 attributes:
+ * Each class has 3 attributes:
  *   - device that is the selector of the emulated device interface to click.
- *   - smartObjAppName is the const name of the app used for the smart object. "EZVIZ" is the const value in this case.
- *   - smartObjType is const the name of the object manipulated by the class. "Smart Plug" is the const value in this case.
- *   - smartObjState is the initial true state of the smart device.
+ *   - obj that is the container of:
+ *     - smart object android app name and smart object android app package name.
+ *     - smart object device type.
+ *     - smart object device model.
+ *   - objState that is the current real state of the smart object. Set it accordingly when instantiating the kotlin object.
  */
-class EzvizSmartPlug (val device: UiDevice,
-                      private val smartObjAppName: String = SmartObjAppNames.EZVIZ.toString(),
-                      private val smartObjType: String = SmartObjTypes.SMARTPLUG.type,
-                      private var smartObjState: SmartObjStates = SmartObjStates.STATE_ON
-                      ) {
+class EzvizSmartPlug (private val device: UiDevice,
+                      private val obj: SmartObjModel = SmartObjModel.T31,
+                      private var objState: SmartObjState = SmartObjState.STATE_ON) {
 
     // Method that set the delay between actions
     private fun setDelay(delay: Long) {
@@ -36,8 +36,8 @@ class EzvizSmartPlug (val device: UiDevice,
             val currpkgname = device.currentPackageName
             // Get the value of home view Android package name. 
             val androidpkgname = SmartObjPkgName.ANDROID.pkgName
-            // Set the value of next package name to be opened to Tapo app package name. 
-            val nextpkgname = SmartObjPkgName.TAPO.pkgName
+            // Set the value of next package name to be opened to EZVIZ app package name. 
+            val nextpkgname = obj.app.pkgName
 
             // Get back to home Android Layout if the previous event involved another App.
             // The first condition assures that it is not pressed the home button if the view displayed is the Android home one.
@@ -47,20 +47,20 @@ class EzvizSmartPlug (val device: UiDevice,
                 pressHomeButton()
             }
 
-            // Open Tapo App if not yet.
+            // Open EZVIZ App if not yet.
             if (!currpkgname.equals(nextpkgname)) {
 
-                // Select the Tapo app
+                // Select the EZVIZ app
                 val allAppsButton: UiObject = device.findObject(
                     UiSelector().description(
-                        smartObjAppName))
+                        obj.app.appName))
 
-                // Open the Tapo app
+                // Open the EZVIZ app
                 allAppsButton.clickAndWaitForNewWindow()
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return 2
         }
 
@@ -72,11 +72,11 @@ class EzvizSmartPlug (val device: UiDevice,
         // Select Plug Tab
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT.rid))
+                SmartObjResourceId.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT.rid))
             .getChild(UiSelector().text(
                 SmartObjTextSelector.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_PLUGS.textLabel)).click()
 
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that clicks the home button 
@@ -86,9 +86,9 @@ class EzvizSmartPlug (val device: UiDevice,
 
     // Method that controls the current state of the smart device
     private fun checkPlugStatus(): Boolean {
-        return when(smartObjState){
-            SmartObjStates.STATE_ON  -> SmartObjStates.STATE_ON.state
-            SmartObjStates.STATE_OFF -> SmartObjStates.STATE_OFF.state
+        return when(objState){
+            SmartObjState.STATE_ON  -> SmartObjState.STATE_ON.state
+            SmartObjState.STATE_OFF -> SmartObjState.STATE_OFF.state
         }
     }
 
@@ -98,7 +98,7 @@ class EzvizSmartPlug (val device: UiDevice,
         try {
             selectSmartPlugTab()
         } catch (e: Exception) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
@@ -109,7 +109,7 @@ class EzvizSmartPlug (val device: UiDevice,
                 false -> turnOn()
             }
         } catch (e: Exception) {
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
     }
 
@@ -117,37 +117,37 @@ class EzvizSmartPlug (val device: UiDevice,
     private fun turnOn() {
 
         // Click the button element on current view.
-        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
+        device.findObject(UiSelector().resourceId(SmartObjResourceId.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
 
-        // Change the smartObjState class attribute to ON
-        smartObjState = SmartObjStates.STATE_ON
+        // Change the objState class attribute to ON
+        objState = SmartObjState.STATE_ON
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON plug]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Turn ON plug]\n")
 
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that turns on the smart device changing its state to OFF.
     private fun turnOff() {
 
         // click the button element on current view.
-        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
+        device.findObject(UiSelector().resourceId(SmartObjResourceId.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
 
 
-        if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_SMARTPLUG_POPUP_TURNOFF_PLUG_MESSAGE.textLabel).resourceId(SmartObjResourceIDs.ANDROID_MESSAGE.rid)).exists()) {
+        if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_SMARTPLUG_POPUP_TURNOFF_PLUG_MESSAGE.textLabel).resourceId(SmartObjResourceId.ANDROID_MESSAGE.rid)).exists()) {
             // Closing Popup window
-            device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_SMARTPLUG_DISABLE_TAG.textLabel).resourceId(SmartObjResourceIDs.ANDROID_BUTTON1.rid)).click()
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_SMARTPLUG_DISABLE_TAG.textLabel).resourceId(SmartObjResourceId.ANDROID_BUTTON1.rid)).click()
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
         }
 
-        // change the smartObjState class attribute to OFF
-        smartObjState = SmartObjStates.STATE_OFF
+        // change the objState class attribute to OFF
+        objState = SmartObjState.STATE_OFF
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF plug]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Turn OFF plug]\n")
 
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that handles the random feedback popups that appears on current app view.
@@ -155,7 +155,7 @@ class EzvizSmartPlug (val device: UiDevice,
         // Check if the popup is on view
         if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_FEEDBACK.textLabel)).exists()) {
             // Closing Popup window
-            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
+            device.findObject(UiSelector().resourceId(SmartObjResourceId.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
         }
     }
 
@@ -169,7 +169,7 @@ class EzvizSmartPlug (val device: UiDevice,
     // In this case the only action is to switch on/off the plug so selectRandomInstrumentedTest end execSeqInstrumentedTest have the identical behaviour.
     fun execSeqInstrumentedTest() {
 
-        //if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
+        //if (!device.currentPackageName.equals(obj.app.pkgName)) launchSmartApp()
 
         // Error launcher variable
         // The meaning of the errl return code is explained in the launchSmartApp method.

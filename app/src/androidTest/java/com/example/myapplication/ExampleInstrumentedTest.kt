@@ -18,19 +18,19 @@ class ExampleInstrumentedTest {
 
     @Test
     fun useAppContext() {
-        // Context of the app under test.
+        // Context device of the app under test.
         val device: UiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
-        // Object that is an instance of TapoSmartBulb.kt class
+        // Object that is an instance of TapoSmartBulb.kt class L530E model.
         val tapoSmartBulb = TapoSmartBulb(device=device, smartObjState=SmartObjStates.STATE_OFF)
 
-        // Object that is an instance of EzvizSmartBulb.kt class
+        // Object that is an instance of EzvizSmartBulb.kt class LB1 model.
         val ezvizSmartBulb = EzvizSmartBulb(device=device, smartObjState=SmartObjStates.STATE_OFF)
 
-        // Object that is an instance of TapoSmartPlug.kt class
+        // Object that is an instance of TapoSmartPlug.kt class P100 model.
         val tapoSmartPlug = TapoSmartPlug(device=device, smartObjState=SmartObjStates.STATE_OFF)
 
-        // Object that is an instance of EzvizSmartPlug.kt class
+        // Object that is an instance of EzvizSmartPlug.kt class T31 model.
         val ezvizSmartPlug = EzvizSmartPlug(device=device, smartObjState=SmartObjStates.STATE_OFF)
 
         //var nextpkgname = SmartObjPkgName.ANDROID.pkgName
@@ -43,7 +43,7 @@ class ExampleInstrumentedTest {
 
             // SecureRandom().nextInt(4) -> random number in range [0, n-1] -> random number in range [0,3]
             // SecureRandom().nextInt(4).plus(1) -> random number in range [1, 4]
-            //   - 1 is associated to Tapo  Smart Bulb L530U device
+            //   - 1 is associated to Tapo  Smart Bulb L530E device
             //   - 2 is associated to Ezviz Smart Bulb LB1   device
             //   - 3 is associated to Tapo  Smart Plug P100  device
             //   - 4 is associated to Ezviz Smart Plug T31   device

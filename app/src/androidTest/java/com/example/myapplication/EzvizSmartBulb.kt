@@ -12,17 +12,17 @@ import kotlin.random.Random
  * Ezviz Smart Bulb Android application class definition.
  * Tested with LB1 smart device.
  *
- * Each class has 4 attributes:
+ * Each class has 3 attributes:
  *   - device that is the selector of the emulated device interface to click.
- *   - smartObjAppName is the const name of the app used for the smart object. "EZVIZ" is the const value in this case.
- *   - smartObjType is const the name of the object manipulated by the class. "Smart Bulb" is the const value in this case.
- *   - smartObjState is the initial true state of the smart device.
+ *   - obj that is the container of:
+ *     - smart object android app name and smart object android app package name.
+ *     - smart object device type.
+ *     - smart object device model.
+ *   - objState that is the current real state of the smart object. Set it accordingly when instantiating the kotlin object.
  */
-class EzvizSmartBulb (val device: UiDevice,
-                      private val smartObjAppName: String = SmartObjAppNames.EZVIZ.toString(),
-                      private val smartObjType: String = SmartObjTypes.SMARTBULB.type,
-                      private var smartObjState: SmartObjStates = SmartObjStates.STATE_ON
-                      ) {
+class EzvizSmartPlug (private val device: UiDevice,
+                      private val obj: SmartObjModel = SmartObjModel.LB1,
+                      private var objState: SmartObjState = SmartObjState.STATE_ON) {
 
     // Method that set the delay between actions
     private fun setDelay(delay: Long) {
@@ -39,8 +39,8 @@ class EzvizSmartBulb (val device: UiDevice,
             val currpkgname = device.currentPackageName
             // Get the value of home view Android package name. 
             val androidpkgname = SmartObjPkgName.ANDROID.pkgName
-            // Set the value of next package name to be opened to Tapo app package name. 
-            val nextpkgname = SmartObjPkgName.TAPO.pkgName
+            // Set the value of next package name to be opened to EZVIZ app package name. 
+            val nextpkgname = obj.app.pkgName
 
             // Get back to home Android Layout if the previous event involved another App.
             // The first condition assures that it is not pressed the home button if the view displayed is the Android home one.
@@ -50,39 +50,39 @@ class EzvizSmartBulb (val device: UiDevice,
                 pressHomeButton()
             }
 
-            // Open Tapo App if not yet.
+            // Open EZVIZ App if not yet.
             if (!currpkgname.equals(nextpkgname)) {
 
-                // Select the Tapo app
+                // Select the EZVIZ app
                 val allAppsButton: UiObject = device.findObject(
                     UiSelector().description(
-                        smartObjAppName))
+                        obj.app.appName))
 
-                // Open the Tapo app
+                // Open the EZVIZ app
                 allAppsButton.clickAndWaitForNewWindow()
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${smartObjAppName}] [DEVICE: ${smartObjType}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return 2
         }
 
         return 0
     }
 
-    // Method that opens the Smart Bulb management window frame inside Tapo app.
+    // Method that opens the Smart Bulb management window frame inside EZVIZ app.
     private fun selectSmartBulbTab() {
 
         // Select Bulb Tab
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT.rid))
+                SmartObjResourceId.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT.rid))
             .getChild(UiSelector().text(
                 SmartObjTextSelector.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_BULBS.textLabel)).click()
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
-    // Method that opens the Smart Bulb management window frame inside Tapo app.
+    // Method that opens the Smart Bulb management window frame inside EZVIZ app.
     private fun openSmartBulb() {
 
         selectSmartBulbTab()
@@ -93,13 +93,13 @@ class EzvizSmartBulb (val device: UiDevice,
         // Click on the Bulb button to open to bulb main layout
         device.findObject(
             UiSelector().resourceId(
-                SmartObjResourceIDs.EZVIZ_SMARTHOME_MAIN_LAYOUT.rid))
+                SmartObjResourceId.EZVIZ_SMARTHOME_MAIN_LAYOUT.rid))
             .clickAndWaitForNewWindow()
 
         // delay introduced in order to allow the following tasks to be accomplished
         // (based on pixels elements position)
         // otherwise the window it is not already loaded in order to perform these type of tasks.
-        setDelay(SmartObjDelays.DELAY_WINDOW.delay)
+        setDelay(SmartObjDelay.DELAY_WINDOW.delay)
     }
 
     // Method that clicks the back button 
@@ -114,9 +114,9 @@ class EzvizSmartBulb (val device: UiDevice,
 
     // Method that controls the current state of the smart device
     private fun checkBulbStatus(): Boolean {
-        return when(smartObjState){
-            SmartObjStates.STATE_ON  -> SmartObjStates.STATE_ON.state
-            SmartObjStates.STATE_OFF -> SmartObjStates.STATE_OFF.state
+        return when(objState){
+            SmartObjState.STATE_ON  -> SmartObjState.STATE_ON.state
+            SmartObjState.STATE_OFF -> SmartObjState.STATE_OFF.state
         }
     }
 
@@ -127,7 +127,7 @@ class EzvizSmartBulb (val device: UiDevice,
             selectSmartBulbTab();
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
@@ -139,7 +139,7 @@ class EzvizSmartBulb (val device: UiDevice,
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
     }
 
@@ -148,35 +148,35 @@ class EzvizSmartBulb (val device: UiDevice,
 
         // non richiamo funzione click()
         //click()
-        //smartObjState = SmartObjStates.STATE_ON
+        //objState = SmartObjState.STATE_ON
         // delay superfluo, c'e' gia' in funzione click()
-        // setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        // setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
         // click the button element on current view.
-        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
+        device.findObject(UiSelector().resourceId(SmartObjResourceId.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
 
-        // change the smartObjState class attribute to ON
-        smartObjState = SmartObjStates.STATE_ON
+        // change the objState class attribute to ON
+        objState = SmartObjState.STATE_ON
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn ON bulb]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Turn ON bulb]\n")
 
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that turns on the smart device changing its state to OFF.
     private fun turnOff() {
 
         // click the button element on current view.
-        device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
+        device.findObject(UiSelector().resourceId(SmartObjResourceId.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
 
-        // change the smartObjState class attribute to OFF
-        smartObjState = SmartObjStates.STATE_OFF
+        // change the objState class attribute to OFF
+        objState = SmartObjState.STATE_OFF
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Turn OFF bulb]\n")
+        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Turn OFF bulb]\n")
 
-        setDelay(SmartObjDelays.DELAY_ACTION.delay)
+        setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that changes the brightness of the bulb choosing the value to set randomly.
@@ -186,7 +186,7 @@ class EzvizSmartBulb (val device: UiDevice,
             selectSmartBulbTab();
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
@@ -207,16 +207,16 @@ class EzvizSmartBulb (val device: UiDevice,
 
             device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.EZVIZ_SMARTHOME_EDIT_BRIGHT_SEEK_BAR.rid))
+                    SmartObjResourceId.EZVIZ_SMARTHOME_EDIT_BRIGHT_SEEK_BAR.rid))
                 .dragTo(casualMove,middley,steps)
 
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit brightness randomly]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Edit brightness randomly]\n")
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
     }
 
@@ -227,39 +227,39 @@ class EzvizSmartBulb (val device: UiDevice,
             openSmartBulb()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
         try {
             val colorBtn = getCenter(
-                SmartObjCoords.EZVIZ_SMARTBULB_COLOR_BTN.startP,
-                SmartObjCoords.EZVIZ_SMARTBULB_COLOR_BTN.endP
+                SmartObjCoord.EZVIZ_SMARTBULB_COLOR_BTN.startP,
+                SmartObjCoord.EZVIZ_SMARTBULB_COLOR_BTN.endP
             )
 
             device.click(colorBtn.first, colorBtn.second)
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
             // il numbero di step da eseguire e' scelto in modo casuale tra 1 e 10
             val maxStep = SecureRandom().nextInt(10).plus(1)
             for (i in 1..maxStep step 1) {
 
                 val randomPair = getRandomDiskCoords(
-                    SmartObjCoords.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.startP,
-                    SmartObjCoords.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.endP
+                    SmartObjCoord.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.startP,
+                    SmartObjCoord.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.endP
                 )
 
                 device.click(randomPair.first, randomPair.second)
 
                 // Groundtruth log file function writer.
-                writeGroundTruthFile(gtfile, "[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit color randomly]\n")
+                writeGroundTruthFile(gtfile, "[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Edit color randomly]\n")
 
-                setDelay(SmartObjDelays.DELAY_ACTION.delay)
+                setDelay(SmartObjDelay.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
 
         pressBackButton()
@@ -272,35 +272,35 @@ class EzvizSmartBulb (val device: UiDevice,
             openSmartBulb()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
         try {
             val colorTemperatureBtn = getCenter(
-                SmartObjCoords.EZVIZ_SMARTBULB_COLOR_TEMPERATURE_BTN.startP,
-                SmartObjCoords.EZVIZ_SMARTBULB_COLOR_TEMPERATURE_BTN.endP)
+                SmartObjCoord.EZVIZ_SMARTBULB_COLOR_TEMPERATURE_BTN.startP,
+                SmartObjCoord.EZVIZ_SMARTBULB_COLOR_TEMPERATURE_BTN.endP)
             device.click(colorTemperatureBtn.first,colorTemperatureBtn.second)
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
             // il numero di step da eseguire e' scelto in modo casuale tra 1 e 10
             val maxStep = SecureRandom().nextInt(10).plus(1)
             for (i in 1..maxStep step 1) {
 
                 val randomPair = getRandomSemiCircleCoords(
-                    SmartObjCoords.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.startP,
-                    SmartObjCoords.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.endP)
+                    SmartObjCoord.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.startP,
+                    SmartObjCoord.EZVIZ_SMARTBULB_EDIT_COLOR_CIRCLE.endP)
 
                 device.drag(randomPair.first,randomPair.second,randomPair.first, randomPair.second,10)
 
                 // Groundtruth log file function writer.
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Edit color temperature randomly]\n")
+                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Edit color temperature randomly]\n")
 
-                setDelay(SmartObjDelays.DELAY_ACTION.delay)
+                setDelay(SmartObjDelay.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
 
         pressBackButton()
@@ -313,46 +313,46 @@ class EzvizSmartBulb (val device: UiDevice,
             openSmartBulb()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
             return
         }
 
         try {
             val modesBtn = getCenter(
-                SmartObjCoords.EZVIZ_SMARTBULB_MODES_BTN.startP,
-                SmartObjCoords.EZVIZ_SMARTBULB_MODES_BTN.endP)
+                SmartObjCoord.EZVIZ_SMARTBULB_MODES_BTN.startP,
+                SmartObjCoord.EZVIZ_SMARTBULB_MODES_BTN.endP)
 
             device.click(modesBtn.first,modesBtn.second)
 
-            setDelay(SmartObjDelays.DELAY_ACTION.delay)
+            setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
             val baseBtn = device.findObject(
                 UiSelector().resourceId(
-                    SmartObjResourceIDs.ANDROID_CONTENT.rid)).getChild(
+                    SmartObjResourceId.ANDROID_CONTENT.rid)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_FRAMELAYOUT.cn)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_FRAMELAYOUT.cn)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_SCROLLVIEW.cn)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_SCROLLVIEW.cn)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn).index(0)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn).index(0)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn).index(2)).getChild(
+                    SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn).index(2)).getChild(
                 UiSelector().className(
-                    SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn).index(3))
+                    SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn).index(3))
 
             /*
                 val sleeping  = 0
@@ -385,17 +385,17 @@ class EzvizSmartBulb (val device: UiDevice,
 
                 baseBtn.getChild(
                     UiSelector().className(
-                        SmartObjClassNames.EZVIZ_ANDROID_VIEWGROUP.cn)
+                        SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn)
                         .index(randomNumber)).click()
 
                 // Groundtruth log file function writer.
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: Set preset mode $modes]\n")
+                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: Set preset mode $modes]\n")
 
-                setDelay(SmartObjDelays.DELAY_ACTION.delay)
+                setDelay(SmartObjDelay.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: $smartObjAppName] [DEVICE: $smartObjType] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod.toString()}] [ACTION: NOP - ${e.message}]\n")
         }
 
         pressBackButton()
@@ -477,14 +477,14 @@ class EzvizSmartBulb (val device: UiDevice,
         // Check if the popup is on view
         if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_FEEDBACK.textLabel)).exists()) {
             // Closing Popup window
-            device.findObject(UiSelector().resourceId(SmartObjResourceIDs.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
+            device.findObject(UiSelector().resourceId(SmartObjResourceId.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
         }
     }
 
     // Method that manages the possible actions executable for the smart device selected randomly.
     fun selectRandomInstrumentedTest() {
 
-        //if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
+        //if (!device.currentPackageName.equals(obj.app.pkgName)) launchSmartApp()
 
         // Error launcher variable
         // The meaning of the errl return code is explained in the launchSmartApp method.
@@ -511,7 +511,7 @@ class EzvizSmartBulb (val device: UiDevice,
     // Method that manages the possible actions executable for the smart device run sequentially.
     fun execSeqInstrumentedTest() {
 
-        //if (!device.currentPackageName.equals(SmartObjPkgName.EZVIZ.pkgName)) launchSmartApp()
+        //if (!device.currentPackageName.equals(obj.app.pkgName)) launchSmartApp()
 
         // Error launcher variable
         // The meaning of the errl return code is explained in the launchSmartApp method.
