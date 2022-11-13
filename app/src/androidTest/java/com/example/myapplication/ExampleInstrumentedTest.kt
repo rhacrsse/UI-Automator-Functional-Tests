@@ -33,13 +33,10 @@ class ExampleInstrumentedTest {
         // Object that is an instance of EzvizSmartPlug.kt class T31 model.
         val ezvizSmartPlug = EzvizSmartPlug(device=device, objState=SmartObjState.STATE_OFF)
 
-        //var nextpkgname = SmartObjPkgName.ANDROID.pkgName
-
         // Loop that generates up to SMARTOBJ_EVENT_ITERS events
         for (i in 1..SMARTOBJ_EVENT_ITERS) {
+            // Get current time in milliseconds
             val st = System.currentTimeMillis()
-
-            //val currpkgname = device.currentPackageName
 
             // SecureRandom().nextInt(4) -> random number in range [0, n-1] -> random number in range [0,3]
             // SecureRandom().nextInt(4).plus(1) -> random number in range [1, 4]
@@ -50,37 +47,25 @@ class ExampleInstrumentedTest {
             val seed = SecureRandom().nextInt(4).plus(1)
 
             // Conditional statement that checks what is the next app to open.
+            // It must be changed accordingly to the number of devices to be inspected.
             when (seed) {
-                1 -> {
-                    //nextpkgname = SmartObjPkgName.TAPO.pkgName
-                    //if (!nextpkgname.equals(currpkgname)) device.pressHome()
-                    tapoSmartBulb.selectRandomInstrumentedTest()
-                }
-                2 -> {
-                    //nextpkgname = SmartObjPkgName.EZVIZ.pkgName
-                    //if (!nextpkgname.equals(currpkgname)) device.pressHome()
-                    ezvizSmartBulb.selectRandomInstrumentedTest()
-                }
-                3 -> {
-                    //nextpkgname = SmartObjPkgName.TAPO.pkgName
-                    //if (!nextpkgname.equals(currpkgname)) device.pressHome()
-                    tapoSmartPlug.selectRandomInstrumentedTest()
-                }
-                4 -> {
-                    //nextpkgname = SmartObjPkgName.EZVIZ.pkgName
-                    //if (!nextpkgname.equals(currpkgname)) device.pressHome()
-                    ezvizSmartPlug.selectRandomInstrumentedTest()
-                }
+                1 -> tapoSmartBulb.selectRandomInstrumentedTest()
+                2 -> ezvizSmartBulb.selectRandomInstrumentedTest()
+                3 -> tapoSmartPlug.selectRandomInstrumentedTest()
+                4 -> ezvizSmartPlug.selectRandomInstrumentedTest()
             }
 
+            // Increase event counter
             SMARTOBJ_EVENT_NUMBER++
 
+            // Get current time in milliseconds
             val et = System.currentTimeMillis()
 
             // Generate an event every SmartObjDelays.DELAY_EVENT.delay seconds
-            // This variables is set in Utils.kt file. Now is value is 60 s, so
+            // This variable is set in Utils.kt file. Now is value is 60 s, so
             // we are generating one event every 60 seconds give or take.
             // In order to do so we subtract execution delays of intermediate actions between events.
+            // Set the delay to wait before the next event will be generated.
             Thread.sleep((SmartObjDelay.DELAY_EVENT.delay).minus(et.minus(st)))
         }
     }

@@ -7,7 +7,7 @@ import androidx.test.uiautomator.*
 /*
  *
  * Tapo Tp-Link Smart Plug Android application class definition.
- * Tested with P100 smart device.
+ * Tested with P100 Tapo Tp-Link smart device.
  *
  * Each class has 3 attributes:
  *   - device that is the selector of the emulated device interface to click.
@@ -21,41 +21,45 @@ class TapoSmartPlug (private val device: UiDevice,
                      private val obj: SmartObjModel = SmartObjModel.P100,
                      private var objState: SmartObjState = SmartObjState.STATE_ON) {
 
-    // Method that set the delay between actions
+    // Method that set the delay between actions or events.
     private fun setDelay(delay: Long) {
         Thread.sleep(delay)
     }
 
-    // Method that opens the android app from the android home window frame.
+    // Method that opens the Tapo app from the android homescreen view frame.
     // return errcode -> 0: App opened succesfully.
     //                -> 2: Error encountered.
     private fun launchSmartApp(): Int {
         try {
 
-            // Get the current package name that identifies the app currently opened on the Android Layout.
+            // Get the current package name that identifies the app currently opened on the Android Frame Layout.
             val currpkgname = device.currentPackageName
-            // Get the value of home view Android package name. 
+            // Value of the Android homescreen view frame package name. 
             val androidpkgname = SmartObjPkg.ANDROID.pkgName
-            // Set the value of next package name to be opened to Tapo app package name. 
+            // Value of the next package name to be opened. It this is the the package name of Tapo app.
             val nextpkgname = obj.app.pkg.pkgName
 
-            // Get back to home Android Layout if the previous event involved another App.
-            // The first condition assures that it is not pressed the home button if the view displayed is the Android home one.
-            // The second condition ensures that is is not pressed the home button if the view displayed is already the correct one,
+            // Get back to homescreen Android Frame Layout if the previous event involved another App.
+            // The 2 following conditions use the package name associated to the App currently opened in the Frame Layout to perform the check.
+            // It is needed to get back to the homescreen Android Frame Layout, in case we are in another App homescreen (CONDITION #2)
+            // rather than the one actually showed.
+            // The App actually opend must be different from Android homescreen Frame Layout (CONDITION #1).
+            // The 1st condition assures that it is not pressed the home button if the view displayed is the Android homescreen one.
+            // The 2nd condition ensures that it is not pressed the home button if the view displayed is already the correct one,
             // so we are already where we want to be, due to the previous event that has exploited the same App.
             if (!currpkgname.equals(androidpkgname) && !currpkgname.equals(nextpkgname)) {
                 pressHomeButton()
             }
 
-            // Open Tapo App if not yet.
+            // Open Tapo App if not yet so.
             if (!currpkgname.equals(nextpkgname)) {
 
-                // Select the Tapo app
+                // Select the Tapo app Icon.
                 val allAppsButton: UiObject = device.findObject(
                     UiSelector().description(
                         obj.app.appName))
 
-                // Open the Tapo app
+                // Click the Tapo icon an Open the Tapo app.
                 allAppsButton.clickAndWaitForNewWindow()
             }
         } catch (e: Exception) {
@@ -68,7 +72,7 @@ class TapoSmartPlug (private val device: UiDevice,
     }
 
     // Method that opens the Smart Plug management window frame inside Tapo app.
-    // return code -> 0: Error encountered.
+    // return code -> 0: Error encountered, no steps done.
     //             -> 1: Error encountered, but 1 step accomplished. It is needed to step back of 1 view.
     //             -> 2: All 2 steps accomplished, smart plug view opened succesfully.
     private fun openSmartPlug(): Int {
@@ -122,7 +126,7 @@ class TapoSmartPlug (private val device: UiDevice,
     private fun click() {
 
         try {
-            // control the plug current state and turn it OFF if it is ON, or turn it ON if it is OFF.
+            // Control the plug current state and turn it OFF if it is ON, or turn it ON if it is OFF.
             when(checkPlugStatus()) {
                 true  -> turnOff()
                 false -> turnOn()
@@ -145,27 +149,29 @@ class TapoSmartPlug (private val device: UiDevice,
         // Groundtruth log file function writer.
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Turn ON plug]\n")
 
+        // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
-    // Method that turns on the smart device changing its state to OFF.
+    // Method that turns off the smart device changing its state to OFF.
     private fun turnOff() {
 
-        // click the button element on current view.
+        // Click the button element on current view.
         device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTPLUG_STATE_BTN.rid)).click()
 
-        // change the objState class attribute to OFF
+        // Change the objState class attribute to OFF
         objState = SmartObjState.STATE_OFF
 
         // Groundtruth log file function writer.
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Turn OFF plug]\n")
 
+        // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
     // Method that handles the random feedback popups that appears on current app view.
     private fun checkPopUpFeedback() {
-        // Check if the popup is on view
+        // Check if the popup is on View Frame Layout
         if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
             // Closing Popup window
             device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
@@ -181,9 +187,6 @@ class TapoSmartPlug (private val device: UiDevice,
     // Method that manages the possible actions executable for the smart device run sequentially.
     // In this case the only action is to switch on/off the plug so selectRandomInstrumentedTest end execSeqInstrumentedTest have the identical behaviour.
     fun execSeqInstrumentedTest() {
-
-        //var errl = 0
-        //if (!device.currentPackageName.equals(obj.app.pkgName)) errl = launchSmartApp()
 
         // Error launcher variable
         // The meaning of the errl return code is explained in the launchSmartApp method.

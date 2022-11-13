@@ -12,7 +12,7 @@ import kotlin.math.sin
 /*
  *
  * Tapo Tp-Link Smart Bulb Android application class definition.
- * Tested with L530E smart device.
+ * Tested with L530E Tapo Tp-Link smart device.
  *
  * Each class has 3 attributes:
  *   - device that is the selector of the emulated device interface to click.
@@ -26,41 +26,45 @@ class TapoSmartBulb (private val device: UiDevice,
                      private val obj: SmartObjModel = SmartObjModel.L530E,
                      private var objState: SmartObjState = SmartObjState.STATE_ON) {
 
-    // Method that set the delay between actions
+    // Method that set the delay between actions or events.
     private fun setDelay(delay: Long) {
         Thread.sleep(delay)
     }
 
-    // Method that opens the android app from the android home window frame.
+    // Method that opens the Tapo app from the android home window frame.
     // return errcode -> 0: App opened succesfully.
     //                -> 2: Error encountered.
     private fun launchSmartApp(): Int {
         try {
 
-            // Get the current package name that identifies the app currently opened on the Android Layout.
+            // Get the current package name that identifies the app currently opened on the Android Frame Layout.
             val currpkgname = device.currentPackageName
-            // Get the value of home view Android package name. 
+            // Value of the Android homescreen view frame package name.
             val androidpkgname = SmartObjPkg.ANDROID.pkgName
-            // Set the value of next package name to be opened to Tapo app package name. 
+            // Value of the next package name to be opened. It this is the the package name of Tapo app.
             val nextpkgname = obj.app.pkg.pkgName
 
-            // Get back to home Android Layout if the previous event involved another App.
-            // The first condition assures that it is not pressed the home button if the view displayed is the Android home one.
-            // The second condition ensures that is is not pressed the home button if the view displayed is already the correct one,
+            // Get back to homescreen Android Frame Layout if the previous event involved another App.
+            // The 2 following conditions use the package name associated to the App currently opened in the Frame Layout to perform the check.
+            // It is needed to get back to the homescreen Android Frame Layout, in case we are in another App homescreen (condition #2)
+            // rather than the one actually showed.
+            // The App actually opend must be different from Android homescreen Frame Layout (condition #1).
+            // The first condition assures that it is not pressed the home button if the view displayed is the Android homescreen one.
+            // The second condition ensures that it is not pressed the home button if the view displayed is already the correct one,
             // so we are already where we want to be, due to the previous event that has exploited the same App.
             if (!currpkgname.equals(androidpkgname) && !currpkgname.equals(nextpkgname)) {
                 pressHomeButton()
             }
 
-            // Open Tapo App if not yet.
+            // Open Tapo App if not yet so.
             if (!currpkgname.equals(nextpkgname)) {
 
-                // Select the Tapo app
+                // Select the Tapo app Icon.
                 val allAppsButton: UiObject = device.findObject(
                     UiSelector().description(
                         obj.app.appName))
 
-                // Open the Tapo app
+                // Click the Tapo icon an Open the Tapo app.
                 allAppsButton.clickAndWaitForNewWindow()
             }
         } catch (e: Exception) {
@@ -73,7 +77,7 @@ class TapoSmartBulb (private val device: UiDevice,
     }
 
     // Method that opens the Smart Bulb management window frame inside Tapo app.
-    // return code -> 0: Error encountered.
+    // return code -> 0: Error encountered, no steps done.
     //             -> 1: Error encountered, but 1 step accomplished. It is needed to step back of 1 view.
     //             -> 2: All 2 steps accomplished, smart plug view opened succesfully.
     private fun openSmartBulb(): Int {
@@ -91,7 +95,7 @@ class TapoSmartBulb (private val device: UiDevice,
         }
 
         try {
-            // Open Smart Plug management view
+            // Open Smart Plug management view.
             device.findObject(
                 UiSelector().text(
                     SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_BULBS.textLabel))
@@ -105,17 +109,17 @@ class TapoSmartBulb (private val device: UiDevice,
         return 2
     }
 
-    // Method that clicks the back button 
+    // Method that clicks the back button.
     private fun pressBackButton() {
         device.pressBack()
     }
 
-    // Method that clicks the home button 
+    // Method that clicks the home button.
     private fun pressHomeButton() {
         device.pressHome()
     }
 
-    // Method that controls the current state of the smart device
+    // Method that controls the current state of the smart device.
     private fun checkBulbStatus(): Boolean {
         return when(objState){
             SmartObjState.STATE_ON  -> SmartObjState.STATE_ON.state
@@ -141,47 +145,49 @@ class TapoSmartBulb (private val device: UiDevice,
     // Method that turns on the smart device changing its state to ON.
     private fun turnOn() {
 
-        // click the button element on current view.
+        // Click the button element on current view.
         device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTBULB_STATE_BTN.rid)).click()
 
-        // change the objState class attribute to ON
+        // Change the objState class attribute to ON.
         objState = SmartObjState.STATE_ON
 
         // Groundtruth log file function writer.
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Turn ON bulb]\n")
 
+        // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
-    // Method that turns on the smart device changing its state to OFF.
+    // Method that turns off the smart device changing its state to OFF.
     private fun turnOff() {
 
-        // click the button element on current view.
+        // Click the button element on current view.
         device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTBULB_STATE_BTN.rid)).click()
 
-        // change the objState class attribute to OFF
+        // Change the objState class attribute to OFF
         objState = SmartObjState.STATE_OFF
 
         // Groundtruth log file function writer.
         writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Turn OFF bulb]\n")
 
+        // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
-    // Method that increases the brightness of the bulb choosing the value to set randomly.
+    // Method that increases the brightness of the bulb choosing the value randomly.
     private fun increaseBrightSlider() {
 
         try {
-            // switch ON the bulb if it is OFF
+            // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
 
-            // Select the slider element able to change the brightness
+            // Select the slider element able to change the brightness.
             val smartBulbBrightness =
                 device.findObject(
                     UiSelector().resourceId(
                         SmartObjResourceId.TAPO_SMARTBULB_MASK_VIEW.rid))
 
-            // change the brightness moving the slider upwards choosing a random number between 2 and 12
+            // Change the brightness moving the slider upwards choosing a random number between 2 and 12.
             // SecureRandom().nextInt(11) -> random number in range [0, n-1] -> random number in range [0,10]
             // SecureRandom().nextInt(11).plus(2) -> random number in range [2, 12]
             smartBulbBrightness.swipeUp(SecureRandom().nextInt(11).plus(2))
@@ -189,6 +195,7 @@ class TapoSmartBulb (private val device: UiDevice,
             // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Increase brightness]\n")
 
+            // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
@@ -196,20 +203,20 @@ class TapoSmartBulb (private val device: UiDevice,
         }
     }
 
-    // Method that decreases the brightness of the bulb choosing the value to set randomly.
+    // Method that decreases the brightness of the bulb choosing the value randomly.
     private fun decreaseBrightSlider() {
 
         try {
-            // switch ON the bulb if it is OFF
+            // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
 
-            // Select the slider element able to change the brightness
+            // Select the slider element able to change the brightness.
             val smartBulbBrightness =
                 device.findObject(
                     UiSelector().resourceId(
                         SmartObjResourceId.TAPO_SMARTBULB_MASK_VIEW.rid))
 
-            // change the brightness moving the slider downwards choosing a random number between 2 and 12
+            // Change the brightness moving the slider downwards choosing a random number between 2 and 12.
             // SecureRandom().nextInt(11) -> random number in range [0, n-1] -> random number in range [0,10]
             // SecureRandom().nextInt(11).plus(2) -> random number in range [2, 12]
             smartBulbBrightness.swipeDown(SecureRandom().nextInt(11).plus(2))
@@ -217,6 +224,7 @@ class TapoSmartBulb (private val device: UiDevice,
             // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Decrease brightness]\n")
 
+            // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
@@ -228,10 +236,10 @@ class TapoSmartBulb (private val device: UiDevice,
     private fun increaseColorTemperature() {
 
         try {
-            // Switch ON the bulb if it is OFF
+            // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
 
-            // Select the viewgroup element that includes the 7 preset colors 
+            // Select the viewgroup element that includes the 7 preset colors.
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
@@ -251,6 +259,7 @@ class TapoSmartBulb (private val device: UiDevice,
                     SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
+            // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
@@ -276,6 +285,7 @@ class TapoSmartBulb (private val device: UiDevice,
             // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Increase color temperature]\n")
 
+            // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
@@ -288,6 +298,7 @@ class TapoSmartBulb (private val device: UiDevice,
                 SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
             .clickAndWaitForNewWindow()
 
+        // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
@@ -295,10 +306,10 @@ class TapoSmartBulb (private val device: UiDevice,
     private fun decreaseColorTemperature() {
 
         try {
-            // Switch ON the bulb if it is OFF
+            // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
 
-            // Select the viewgroup element that includes the 7 preset colors 
+            // Select the viewgroup element that includes the 7 preset colors.
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
@@ -318,6 +329,7 @@ class TapoSmartBulb (private val device: UiDevice,
                     SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
+            // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
@@ -343,6 +355,7 @@ class TapoSmartBulb (private val device: UiDevice,
             // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Decrease color temperature]\n")
 
+            // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
         } catch (e: Exception) {
@@ -356,6 +369,7 @@ class TapoSmartBulb (private val device: UiDevice,
                 SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
             .clickAndWaitForNewWindow()
 
+        // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
@@ -363,10 +377,10 @@ class TapoSmartBulb (private val device: UiDevice,
     private fun editColor() {
 
         try {
-            // Switch ON the bulb if it is OFF
+            // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
 
-            // Select the viewgroup element that includes the 7 preset colors 
+            // Select the viewgroup element that includes the 7 preset colors.
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
@@ -386,6 +400,7 @@ class TapoSmartBulb (private val device: UiDevice,
                     SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(2))
                 .click()
 
+            // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
@@ -400,6 +415,7 @@ class TapoSmartBulb (private val device: UiDevice,
                     SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_BTN.rid))
                 .clickAndWaitForNewWindow()
 
+            // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
             // Select the disk color picker element using its resource identifier.
@@ -408,7 +424,7 @@ class TapoSmartBulb (private val device: UiDevice,
                     SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_COLOR_PICKER.rid))
 
             // It is set arbitrarily a random number betwen 1 and 10 to set the steps of a for loop,
-            // in which it will selected a point inside the picker such that the color of the bulb changes.
+            // in which it will be selected a point inside the picker such that the color of the bulb changes.
             // SecureRandom().nextInt(10) -> random number in range [0, n-1] -> random number in range [0,9]
             // SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
             val maxStep = SecureRandom().nextInt(10).plus(1)
@@ -424,12 +440,13 @@ class TapoSmartBulb (private val device: UiDevice,
                     Pair(basicselector.bounds.left, basicselector.bounds.top),
                     Pair(basicselector.bounds.right, basicselector.bounds.bottom))
 
-                // Click the random point got
+                // Click the random point got.
                 device.click(randomPair.first,randomPair.second)
 
                 // Groundtruth log file function writer.
                 writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Edit color randomly]\n")
 
+                // Set the delay for the current action to be accomplished.
                 setDelay(SmartObjDelay.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
@@ -443,6 +460,7 @@ class TapoSmartBulb (private val device: UiDevice,
                 SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
             .clickAndWaitForNewWindow()
 
+        // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
 
@@ -450,16 +468,16 @@ class TapoSmartBulb (private val device: UiDevice,
     private fun setPresetColor() {
 
         try {
-            // Switch ON the bulb if it is OFF
+            // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
 
-            // Select the viewgroup element that includes the 7 preset colors 
+            // Select the viewgroup element that includes the 7 preset colors .
             val smartBulbPresetColors = device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
 
             // It is set arbitrarily a random number betwen 1 and 10 to set the steps of a for loop,
-            // in which it will selected a different preset color changing the color hue of the bulb. 
+            // in which it will be selected a different preset color changing the color hue of the bulb. 
             // SecureRandom().nextInt(10) -> random number in range [0, n-1] -> random number in range [0,9]
             // SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
             val maxStep = SecureRandom().nextInt(10).plus(1)
@@ -473,7 +491,7 @@ class TapoSmartBulb (private val device: UiDevice,
                 /*
                  * The preset colors in the Tapo App for the bulb are 8.
                  * They are identified by the idx variable that you find scrolling the code downwards.
-                 * Since the first preset color is AUTO and it has 2 sub-preset modes, it is needed to handle this situation.
+                 * Since the first preset color is AUTO and it has 2 sub-preset modes, it is needed to handle this scenario.
                  * In order to do that it has been create a second variable randomNumber that takes into account it. 
                  * randomNumber variable splits the first variable AUTO in 2 so instead of having 8 elements it holds 9 ones.
                  */
@@ -498,16 +516,16 @@ class TapoSmartBulb (private val device: UiDevice,
                 var randomNumber = SecureRandom().nextInt(9).plus(1)
 
                 /*
-                 *  This check is due to the possible scenario in which the randomNumber actually got is equal to the previous one.
-                 *  In this way, it has been clicked 2 times in a row the same preset color.
-                 *  Unfortunately doing so, it will be opened the customization view for that color.
-                 *  This is considered un unexpected behavioiur.
-                 *  In order to avoid this to happen, it has been controlled the randomNumber value got.
-                 *  If this value is equivalent to the previous one, we try to get another random value until a value
+                 * This check is due to the possible scenario in which the randomNumber actually got is equal to the previous one.
+                 * In this way, it has been clicked 2 times in a row the same preset color.
+                 * Unfortunately doing so, it will be opened the customization view for that color.
+                 * This is considered un unexpected behavioiur.
+                 * In order to avoid this to happen, it has been controlled the randomNumber value got.
+                 * If this value is equivalent to the previous one, we try to get another random value until a value
                  * different from the previous one will bet got.
                  *
-                 *  SecureRandom().nextInt(9) -> random number in range [0, n-1] -> random number in range [0,8]
-                 *  SecureRandom().nextInt(9).plus(1) -> random number in range [1, 9]
+                 * SecureRandom().nextInt(9) -> random number in range [0, n-1] -> random number in range [0,8]
+                 * SecureRandom().nextInt(9).plus(1) -> random number in range [1, 9]
                  */
                 while (prevRandomNumber == randomNumber) {
                     randomNumber = SecureRandom().nextInt(9).plus(1)
@@ -547,9 +565,10 @@ class TapoSmartBulb (private val device: UiDevice,
                     else -> randomNumber.minus(2)
                 }
 
-                // Click the preset color button
+                // Click the preset color button.
                 smartBulbPresetColors.getChild(UiSelector().className(SmartObjClassName.TAPO_ANDROID_VIEW.cn).index(idx)).click()
 
+                // Set the delay for the current action to be accomplished.
                 setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
                 /*
@@ -559,20 +578,22 @@ class TapoSmartBulb (private val device: UiDevice,
                  */
                 try {
                     when(randomNumber) {
-                        // auto-compensate
+                        // AUTO-COMPENSATE MODE
                         1 -> {
                             device.findObject(
                                 UiSelector().resourceId(
                                     SmartObjResourceId.TAPO_SMARTBULB_PRESET_AUTO_COMPENSATE_MODE.rid))
                                 .clickAndWaitForNewWindow()
+                            // Set the delay for the current action to be accomplished.
                             setDelay(SmartObjDelay.DELAY_ACTION.delay)
                         }
-                        // auto-match
+                        // AUTO-MATCH MODE
                         2 -> {
                             device.findObject(
                                 UiSelector().resourceId(
                                     SmartObjResourceId.TAPO_SMARTBULB_PRESET_AUTO_MATCH_MODE.rid))
                                 .clickAndWaitForNewWindow()
+                            // Set the delay for the current action to be accomplished.
                             setDelay(SmartObjDelay.DELAY_ACTION.delay)
                         }
                     }
@@ -585,22 +606,22 @@ class TapoSmartBulb (private val device: UiDevice,
                             SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
                         .clickAndWaitForNewWindow()
 
+                    // Set the delay for the current action to be accomplished.
                     setDelay(SmartObjDelay.DELAY_ACTION.delay)
                 }
 
-                // Risoluzione bug che generava un'inconsistenza quando e' selezionato di default il bottone auto-compensate
-                // ed accediamo per la prima volta alla schermata di scelta tra auto-compensate e auto-match all'interno della window
                 /*
                  * APP TAPO TP-LINK GLITCH
-                 * Bug workaround implemented to patch the inconsistencty when by default is focused the auto-compensate button and
+                 * Bug workaround implemented to patch the inconsistencty when by default it is focused the auto-compensate button and
                  * it will be accessed by the first time the view of the AUTO modes.
-                 * This glitch switched OFF the bulb unexpectedly. It will be checked the Bulb status and in case it is OFF, It will be switched ON, before going on.
+                 * This glitch switched OFF the bulb unexpectedly. It will be checked the Bulb status and in case it is OFF, it will be switched ON, before going on.
                  */
                 if (!device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTBULB_STATE_BTN.rid)).isChecked) { objState = SmartObjState.STATE_OFF; turnOn() }
                 
                 // It has been saved the current randomNumber for the next iteration of the for loop.
                 prevRandomNumber = randomNumber
 
+                // Set the delay for the current action to be accomplished.
                 setDelay(SmartObjDelay.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
@@ -609,14 +630,14 @@ class TapoSmartBulb (private val device: UiDevice,
         }
     }
 
-    // Method that activates the DIRECT - PARTY theme preset mode
+    // Method that activates the DIRECT - PARTY theme preset mode.
     private fun enablePartyTheme() {
 
         try {
-            // Switch ON the bulb if it is OFF
+            // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
 
-            // Click Theme button in the smart bulb view to access the Theme View
+            // Click Theme button in the smart bulb view to access the Theme View.
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
@@ -628,7 +649,7 @@ class TapoSmartBulb (private val device: UiDevice,
         }
 
         try {
-            // Click Mode Direct - Party button
+            // Click Mode Direct - Party button.
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_DIRECT_PARTY_BTN.rid)).click()
@@ -636,6 +657,7 @@ class TapoSmartBulb (private val device: UiDevice,
             // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Enable party theme]\n")
 
+            // Set the delay to wait the next window to be loaded.
             setDelay(SmartObjDelay.DELAY_WINDOW.delay)
 
             // Stop Mode Direct - Party after a number of seconds set by the previous setDelay(...) method.
@@ -643,27 +665,28 @@ class TapoSmartBulb (private val device: UiDevice,
                 UiSelector().resourceId(
                     SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid)).click()
 
+            // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
         }
 
-        // Exit from the Theme View 
+        // Exit from the Theme View. 
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
             .clickAndWaitForNewWindow()
     }
 
-    // Method that activates the BREATH - RELAX theme preset mode
+    // Method that activates the BREATH - RELAX theme preset mode.
     private fun enableRelaxTheme() {
 
         try {
-            // Switch ON the bulb if it is OFF
+            // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
 
-            // Click Theme button in the smart bulb view to access the Theme View
+            // Click Theme button in the smart bulb view to access the Theme View.
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
@@ -675,7 +698,7 @@ class TapoSmartBulb (private val device: UiDevice,
         }
 
         try {
-            // Click Mode Breath - Relax button
+            // Click Mode Breath - Relax button.
             device.findObject(
                 UiSelector().resourceId(
                     SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BREATH_RELAX_BTN.rid))
@@ -684,6 +707,7 @@ class TapoSmartBulb (private val device: UiDevice,
             // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Enable relax theme]\n")
 
+            // Set the delay to wait the next window to be loaded.
             setDelay(SmartObjDelay.DELAY_WINDOW.delay)
 
             // Stop Mode Breath - Relax after a number of seconds set by the previous setDelay(...) method.
@@ -691,27 +715,28 @@ class TapoSmartBulb (private val device: UiDevice,
                 UiSelector().resourceId(
                     SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid)).click()
 
+            // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
             writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
         }
 
-        // Exit from the Theme View 
+        // Exit from the Theme View .
         device.findObject(
             UiSelector().resourceId(
                 SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
             .clickAndWaitForNewWindow()
     }
 
-    // Method used the get the center pair (x,y) pixels of a 2D figure given:
+    // Utility Method used the get the center pair (x,y) pixels of a 2D figure given:
     // - startP = starting pair point (x,y) pixels representing top left element bounds.
     // - endP   = ending pair point (x,y) pixels representing bottom right element bounds.
     private fun getCenter(startP: Pair<Int,Int>, endP: Pair<Int,Int>): Pair<Int,Int> {
 
-        // hx identifies half length of the 2D element inspected on x-axis
+        // hx identifies half length of the 2D element inspected on x-axis.
         val hx = (endP.first).minus(startP.first).floorDiv(2)
-        // hy identifies half length of the 2D element inspected on y-axis
+        // hy identifies half length of the 2D element inspected on y-axis.
         val hy = (endP.second).minus(startP.second).floorDiv(2)
 
         // Center coords are being got by adding the 2 half lenghts to the starting point coords.
@@ -721,10 +746,10 @@ class TapoSmartBulb (private val device: UiDevice,
         return Pair(cenx,ceny)
     }
 
-    // Method that computes the radius of a disk (e.g. color picker)
+    // Utiliy Method that computes the radius of a disk (e.g. color picker).
     private fun getRadius(startP: Pair<Int,Int>, endP: Pair<Int,Int>): Int {
 
-        // The radius of a 2 element is equal to half its diameter.
+        // The radius of a 2D element is equal to half its diameter.
 
         // hx identifies half length of the 2D element inspected on x-axis
         val hx = (endP.first).minus(startP.first).floorDiv(2)   // half x
@@ -735,8 +760,9 @@ class TapoSmartBulb (private val device: UiDevice,
         return min(hx, hy)
     }
 
-    // Method to get a random point (identified by a pair of pixels x,y) inside a disk.
+    // Utility Method to get a random point (identified by a pair of pixels x,y) inside a disk.
     private fun getRandomDiskCoords(startP: Pair<Int,Int>, endP: Pair<Int,Int>): Pair<Int,Int> {
+
         // Calculate the center coords of the disk considered.
         val cencoords = getCenter(startP, endP)
         // Get the radius.
@@ -757,28 +783,15 @@ class TapoSmartBulb (private val device: UiDevice,
 
     // Method that handles the random feedback popups that appears on current app view.
     private fun checkPopUpFeedback() {
-        // Check if the popup is on view
+        // Check if the popup is on View Frame Layout.
         if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
-            // Closing Popup window
+            // Closing Popup window.
             device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
         }
     }
 
     // Method that manages the possible actions executable for the smart device selected randomly.
     fun selectRandomInstrumentedTest() {
-
-        // Get the current package name that identifies the app currently opened on the Android Layout.
-        //val currpkgname = device.currentPackageName
-        // Get the value of home view Android package name. 
-        //val androidpkgname = SmartObjPkgName.ANDROID.pkgName
-        // Set the value of next package name to be opened to Tapo app package name. 
-        //val nextpkgname = obj.app.pkgName
-
-        // 
-        //if (!currpkgname.equals(androidpkgname)
-        //     && !currpkgname.equals(nextpkgname)) errl = launchSmartApp()
-        //if (!nextpkgname.equals(currpkgname)) {device.pressHome(); errl = launchSmartApp()}
-        //if (!device.currentPackageName.equals(obj.app.pkgName)) errl = launchSmartApp()
 
         // Error launcher variable
         // The meaning of the errl return code is explained in the launchSmartApp method.
@@ -818,9 +831,6 @@ class TapoSmartBulb (private val device: UiDevice,
 
     // Method that manages the possible actions executable for the smart device run sequentially.
     fun execSeqInstrumentedTest() {
-
-        //var errl = 0
-        //if (!device.currentPackageName.equals(obj.app.pkgName)) errl = launchSmartApp()
 
         // Error launcher variable
         // The meaning of the errl return code is explained in the launchSmartApp method.
