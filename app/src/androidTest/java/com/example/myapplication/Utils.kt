@@ -150,12 +150,12 @@ fun writeGroundTruthFile(sFileName: String, sBody: String){
             val root = File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOCUMENTS)
 
             // The Path of the groundtruth log file is /storage/emulated/0/Documents/gtfile.txt .
-            val gtfile = File(root, sFileName)
-            when (gtfile.exists()) {
+            val logfile = File(root, sFileName)
+            when (logfile.exists()) {
                 // if the file exissts, it will be appended the event.
-                true  -> { gtfile.appendText(sBody) }
+                true  -> { logfile.appendText(sBody) }
                 // if the file does not exist, it will be created, and the first event row will be inserted.
-                false -> { gtfile.createNewFile(); gtfile.writeText(sBody) }
+                false -> { logfile.createNewFile(); logfile.writeText(sBody) }
             }
         }
         catch(e: IOException)

@@ -64,7 +64,7 @@ class TapoSmartPlug (private val device: UiDevice,
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return 2
         }
 
@@ -85,7 +85,7 @@ class TapoSmartPlug (private val device: UiDevice,
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return 0
         }
 
@@ -97,7 +97,7 @@ class TapoSmartPlug (private val device: UiDevice,
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return 1
         }
 
@@ -133,7 +133,7 @@ class TapoSmartPlug (private val device: UiDevice,
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
         }
     }
 
@@ -204,8 +204,9 @@ class TapoSmartPlug (private val device: UiDevice,
                 click()
             }
 
-            if (stepv  > 0) pressBackButton()
-            if (stepv == 2) pressBackButton()
+            for (stepi in stepv downTo 0) {
+                pressBackButton()
+            }
         }
     }
 }

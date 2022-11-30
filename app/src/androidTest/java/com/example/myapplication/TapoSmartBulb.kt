@@ -29,6 +29,7 @@ class TapoSmartBulb (private val device: UiDevice,
     // Method that set the delay between actions or events.
     private fun setDelay(delay: Long) {
         Thread.sleep(delay)
+        // device.wait(Until.hasObject(By.pkg("timeout")),10000) // timeout is a package name that should not exists so the timer will expire.
     }
 
     // Method that opens the Tapo app from the android home window frame.
@@ -66,10 +67,11 @@ class TapoSmartBulb (private val device: UiDevice,
 
                 // Click the Tapo icon an Open the Tapo app.
                 allAppsButton.clickAndWaitForNewWindow()
+                // device.wait(Until.hasObject(By.pkg("com.tplink.iot").res("com.tplink.iot:id/abl_home_bar")), 10000)
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return 2
         }
 
@@ -90,7 +92,7 @@ class TapoSmartBulb (private val device: UiDevice,
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return 0
         }
 
@@ -102,7 +104,7 @@ class TapoSmartBulb (private val device: UiDevice,
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return 1
         }
 
@@ -138,7 +140,7 @@ class TapoSmartBulb (private val device: UiDevice,
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
         }
     }
 
@@ -199,7 +201,7 @@ class TapoSmartBulb (private val device: UiDevice,
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
         }
     }
 
@@ -228,7 +230,7 @@ class TapoSmartBulb (private val device: UiDevice,
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
         }
     }
 
@@ -263,7 +265,7 @@ class TapoSmartBulb (private val device: UiDevice,
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return
         }
 
@@ -289,7 +291,7 @@ class TapoSmartBulb (private val device: UiDevice,
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
         }
 
         // Close the customization view of the blu with index 2 preset color, without saving any changes.
@@ -333,7 +335,7 @@ class TapoSmartBulb (private val device: UiDevice,
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return
         }
 
@@ -360,7 +362,7 @@ class TapoSmartBulb (private val device: UiDevice,
 
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
         }
 
         // Close the customization view of the blu with index 2 preset color, without saving any changes.
@@ -404,7 +406,7 @@ class TapoSmartBulb (private val device: UiDevice,
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return
         }
 
@@ -451,7 +453,7 @@ class TapoSmartBulb (private val device: UiDevice,
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
         }
 
         // Close the customization view of the blu with index 2 preset color, without saving any changes.
@@ -626,7 +628,7 @@ class TapoSmartBulb (private val device: UiDevice,
             }
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
         }
     }
 
@@ -644,7 +646,7 @@ class TapoSmartBulb (private val device: UiDevice,
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return
         }
 
@@ -669,7 +671,7 @@ class TapoSmartBulb (private val device: UiDevice,
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
         }
 
         // Exit from the Theme View. 
@@ -693,7 +695,7 @@ class TapoSmartBulb (private val device: UiDevice,
                 .clickAndWaitForNewWindow()
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
             return
         }
 
@@ -719,7 +721,7 @@ class TapoSmartBulb (private val device: UiDevice,
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message}]\n")
+            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
         }
 
         // Exit from the Theme View .
@@ -824,8 +826,9 @@ class TapoSmartBulb (private val device: UiDevice,
                 }
             }
 
-            if (stepv  > 0) pressBackButton()
-            if (stepv == 2) pressBackButton()
+            for (stepi in stepv downTo 0) {
+                pressBackButton()
+            }
         }
     }
 
@@ -856,8 +859,9 @@ class TapoSmartBulb (private val device: UiDevice,
                 click()
             }
 
-            if (stepv  > 0) pressBackButton()
-            if (stepv == 2) pressBackButton()
+            for (stepi in stepv downTo 0) {
+                pressBackButton()
+            }
         }
     }
 }
