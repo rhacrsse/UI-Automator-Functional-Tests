@@ -2,6 +2,7 @@
 package com.example.myapplication
 
 // KOTLIN/JAVA LIBRARIES
+import android.graphics.Point
 import androidx.test.uiautomator.*
 import java.security.SecureRandom
 import kotlin.math.*
@@ -29,27 +30,44 @@ class EzvizSmartBulb (private val device: UiDevice,
         Thread.sleep(delay)
     }
 
-    // Method that opens the Ezviz app from the android home window frame.
-    // return errcode -> 0: App opened succesfully.
-    //                -> 2: Error encountered.
+    /**
+     * Method that opens the Ezviz app from the android home window frame.
+     * return errcode -> 0: App opened succesfully.
+     *                -> 2: Error encountered.
+     */
     private fun launchSmartApp(): Int {
         try {
 
-            // Get the current package name that identifies the app currently opened on the Android Frame Layout.
+            /**
+             * Get the current package name that identifies the app
+             * currently opened on the Android Frame Layout.
+             */
             val currpkgname = device.currentPackageName
+
             // Value of the Android homescreen view frame package name.
             val androidpkgname = SmartObjPkg.ANDROID.pkgName
-            // Value of the next package name to be opened. It this is the the package name of Ezviz app.
+
+            /**
+             * Value of the next package name to be opened.
+             * It this is the the package name of Ezviz app.
+             */
             val nextpkgname = obj.app.pkg.pkgName
 
-            // Get back to homescreen Android Frame Layout if the previous event involved another App.
-            // The 2 following conditions use the package name associated to the App currently opened in the Frame Layout to perform the check.
-            // It is needed to get back to the homescreen Android Frame Layout, in case we are in another App homescreen (condition #2)
-            // rather than the one actually showed.
-            // The App actually opend must be different from Android homescreen Frame Layout (condition #1).
-            // The first condition assures that it is not pressed the home button if the view displayed is the Android homescreen one.
-            // The second condition ensures that it is not pressed the home button if the view displayed is already the correct one,
-            // so we are already where we want to be, due to the previous event that has exploited the same App.
+            /**
+             * Get back to homescreen Android Frame Layout
+             * if the previous event involved another App.
+             * The 2 following conditions use the package name associated
+             * to the App currently opened in the Frame Layout to perform the check.
+             * It is needed to get back to the homescreen Android Frame Layout, in case
+             * we are in another App homescreen (condition #2) rather than the one actually showed.
+             * The App actually opened must be different
+             * from Android homescreen Frame Layout (condition #1).
+             * The first condition assures that it is not pressed the home button
+             * if the view displayed is the Android homescreen one.
+             * The second condition ensures that it is not pressed the home button
+             * if the view displayed is already the correct one, so we are already
+             * where we want to be, due to the previous event that has exploited the same App.
+             */
             if (!currpkgname.equals(androidpkgname) && !currpkgname.equals(nextpkgname)) {
                 pressHomeButton()
             }
@@ -58,16 +76,29 @@ class EzvizSmartBulb (private val device: UiDevice,
             if (!currpkgname.equals(nextpkgname)) {
 
                 // Select the Ezviz app Icon.
-                val allAppsButton: UiObject = device.findObject(
-                    UiSelector().description(
-                        obj.app.appName))
-
-                // Click the Ezviz icon an Open the Ezviz app.
-                allAppsButton.clickAndWaitForNewWindow()
+                device.findObject(
+                    By.desc(obj.app.appName))
+                    .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
             }
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
+
             return 2
         }
 
@@ -78,11 +109,9 @@ class EzvizSmartBulb (private val device: UiDevice,
     private fun selectSmartBulbTab() {
 
         // Select Bulb Tab.
-        device.findObject(
-            UiSelector().resourceId(
-                SmartObjResourceId.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT.rid))
-            .getChild(UiSelector().text(
-                SmartObjTextSelector.EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_BULBS.textLabel)).click()
+        device.findObject(By.text(SmartObjTextSelector
+            .EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_BULBS.textLabel)).click()
+
         // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
     }
@@ -97,13 +126,9 @@ class EzvizSmartBulb (private val device: UiDevice,
         if (!checkBulbStatus()) { turnOn() }
 
         // Click on the Bulb button to open to bulb main layout.
-        device.findObject(
-            UiSelector().resourceId(
-                SmartObjResourceId.EZVIZ_SMARTHOME_MAIN_LAYOUT.rid))
-            .clickAndWaitForNewWindow()
-
-        // Set the delay to wait the next window to be loaded.
-        setDelay(SmartObjDelay.DELAY_WINDOW.delay)
+        device.findObject(By
+            .res(SmartObjResourceId.EZVIZ_SMARTHOME_MAIN_LAYOUT.rid))
+            .clickAndWait(Until.newWindow(), SmartObjDelay.DELAY_WINDOW.delay)
     }
 
     // Method that clicks the back button.
@@ -128,23 +153,59 @@ class EzvizSmartBulb (private val device: UiDevice,
     private fun click() {
 
         try {
+
             // Select Bulb Tab.
             selectSmartBulbTab()
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
+
             return
         }
 
         try {
-            // Control the plug current state and turn it OFF if it is ON, or turn it ON if it is OFF.
+
+            /**
+             * Control the plug current state and turn it OFF if it is ON,
+             * or turn it ON if it is OFF.
+             */
             when(checkBulbStatus()) {
                 true  -> turnOff()
                 false -> turnOn()
             }
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
         }
     }
 
@@ -152,13 +213,19 @@ class EzvizSmartBulb (private val device: UiDevice,
     private fun turnOn() {
 
         // Click the button element on current view.
-        device.findObject(UiSelector().resourceId(SmartObjResourceId.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
+        device.findObject(By.res(SmartObjResourceId.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
 
         // Change the objState class attribute to ON.
         objState = SmartObjState.STATE_ON
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Turn ON bulb]\n")
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Turn ON bulb]\n")
 
         // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -168,13 +235,19 @@ class EzvizSmartBulb (private val device: UiDevice,
     private fun turnOff() {
 
         // Click the button element on current view.
-        device.findObject(UiSelector().resourceId(SmartObjResourceId.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
+        device.findObject(By.res(SmartObjResourceId.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
 
         // Change the objState class attribute to OFF.
         objState = SmartObjState.STATE_OFF
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Turn OFF bulb]\n")
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Turn OFF bulb]\n")
 
         // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -184,25 +257,52 @@ class EzvizSmartBulb (private val device: UiDevice,
     private fun editBright() {
 
         try {
+
             // Select the Bulb Tab.
             selectSmartBulbTab()
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
+
             return
         }
 
         try {
+
             // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) { turnOn() }
 
-            // Vertical slider.
-            // Set x lower bound value of the slider brigthness on the left side. 
+            /**
+             * Vertical slider.
+             */
+
+            // Set x lower bound value of the slider brightness on the left side.
             val leftx = SmartObjCoord.EZVIZ_SMARTBULB_EDIT_BRIGHT_SEEK_BAR.startP.first
-            // Set x uppoer bound value of the slider brigthness on the left side. 
+
+            // Set x upper bound value of the slider brightness on the left side.
             val rightx = SmartObjCoord.EZVIZ_SMARTBULB_EDIT_BRIGHT_SEEK_BAR.endP.first
+
             // Set y mean value of the slider.
-            val middley = SmartObjCoord.EZVIZ_SMARTBULB_EDIT_BRIGHT_SEEK_BAR.startP.second.plus(SmartObjCoord.EZVIZ_SMARTBULB_EDIT_BRIGHT_SEEK_BAR.endP.second.minus(SmartObjCoord.EZVIZ_SMARTBULB_EDIT_BRIGHT_SEEK_BAR.startP.second).floorDiv(2))
+            val middley = SmartObjCoord.EZVIZ_SMARTBULB_EDIT_BRIGHT_SEEK_BAR.startP.second
+                .plus(SmartObjCoord.EZVIZ_SMARTBULB_EDIT_BRIGHT_SEEK_BAR.endP.second
+                    .minus(SmartObjCoord.EZVIZ_SMARTBULB_EDIT_BRIGHT_SEEK_BAR.startP.second)
+                    .floorDiv(2))
+
             // Drag action number of steps.
             val steps = 1
 
@@ -210,19 +310,39 @@ class EzvizSmartBulb (private val device: UiDevice,
             val casualMove = Random.nextInt(leftx,rightx)
 
             // Drag cursor along the slider changing Bulb brightness.
-            device.findObject(
-                UiSelector().resourceId(
-                    SmartObjResourceId.EZVIZ_SMARTHOME_EDIT_BRIGHT_SEEK_BAR.rid))
-                .dragTo(casualMove,middley,steps)
+            device.findObject(By
+                .res(SmartObjResourceId.EZVIZ_SMARTHOME_EDIT_BRIGHT_SEEK_BAR.rid))
+                .drag(Point(casualMove,middley), steps)
 
             // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Edit brightness randomly]\n")
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Edit brightness randomly]\n")
 
             // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
         }
     }
 
@@ -230,15 +350,33 @@ class EzvizSmartBulb (private val device: UiDevice,
     private fun editColor() {
 
         try {
+
             // Open Smart Plug management view.
             openSmartBulb()
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
+
             return
         }
 
         try {
+
             // Get color hue disk Tab center coords.
             val colorBtn = getCenter(
                 SmartObjCoord.EZVIZ_SMARTBULB_COLOR_BTN.startP,
@@ -251,16 +389,25 @@ class EzvizSmartBulb (private val device: UiDevice,
             // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
-            // It is set arbitrarily a random number betwen 1 and 10 to set the steps of a for loop,
-            // in which it will be selected a point inside the picker such that the color hue of the bulb changes.
-            // SecureRandom().nextInt(10) -> random number in range [0, n-1] -> random number in range [0,9]
-            // SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
+            /*
+             * It is set arbitrarily a random number between 1 and 10 to set the steps of a for loop,
+             * in which it will be selected a point inside the picker,
+             * such that the color hue of the bulb changes.
+             * SecureRandom().nextInt(10) -> random number in range [0, n-1]
+             * -> random number in range [0,9]
+             * SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
+             */
             val maxStep = SecureRandom().nextInt(10).plus(1)
 
-            // The point inside the picker is identified by its pixels coordinates.
-            // It is computed the center point of the picker (cx1,cy1) using the top left and bottom right pixels bounds extracted from the basicSelector element above.
-            // From the center coords of the picker we add/sub a random number calculated exploiting a random radius (upper-bounded by the radius of the picker) and a random azimuth.
-            // In this way it has been obtained a random point inside the picker to select.
+            /**
+             * The point inside the picker is identified by its pixels coordinates.
+             * It is computed the center point of the picker (cx1,cy1) using the top left
+             * and bottom right pixels bounds extracted from the basicSelector element above.
+             * From the center coords of the picker we add/sub a random number
+             * calculated exploiting a random radius (upper-bounded by the radius of the picker)
+             * and a random azimuth.
+             * In this way it has been obtained a random point inside the picker to select.
+             */
             for (i in 1..maxStep step 1) {
 
                 // Get the randomPair in which to move the cursor inside the picker.
@@ -273,14 +420,35 @@ class EzvizSmartBulb (private val device: UiDevice,
                 device.click(randomPair.first, randomPair.second)
 
                 // Groundtruth log file function writer.
-                writeGroundTruthFile(gtfile, "[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Edit color randomly]\n")
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                            + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                            + "[APP: ${obj.app.appName}] "
+                            + "[DEVICE TYPE: ${obj.dev.dev}] "
+                            + "[DEVICE MODEL: ${obj.mod}] "
+                            + "[ACTION: Edit color randomly]\n")
 
                 // Set the delay for the current action to be accomplished.
                 setDelay(SmartObjDelay.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
         }
 
         // Get back to the previous View Frame.
@@ -291,20 +459,37 @@ class EzvizSmartBulb (private val device: UiDevice,
     private fun editColorTemperature() {
 
         try {
+
             // Open Smart Plug management view.
             openSmartBulb()
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
+
             return
         }
 
         try {
+
             // Get color temperature disk Tab center coords.
             val colorTemperatureBtn = getCenter(
                 SmartObjCoord.EZVIZ_SMARTBULB_COLOR_TEMPERATURE_BTN.startP,
                 SmartObjCoord.EZVIZ_SMARTBULB_COLOR_TEMPERATURE_BTN.endP)
-
 
             // Click and Select Color Temperature customization View Frame.
             device.click(colorTemperatureBtn.first,colorTemperatureBtn.second)
@@ -312,16 +497,25 @@ class EzvizSmartBulb (private val device: UiDevice,
             // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
 
-            // It is set arbitrarily a random number betwen 1 and 10 to set the steps of a for loop,
-            // in which it will be selected a point inside the picker such that the color hue of the bulb changes.
-            // SecureRandom().nextInt(10) -> random number in range [0, n-1] -> random number in range [0,9]
-            // SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
+            /**
+             * It is set arbitrarily a random number between 1 and 10 to set the steps of a for loop,
+             * in which it will be selected a point inside the picker,
+             * such that the color hue of the bulb changes.
+             * SecureRandom().nextInt(10) -> random number in range [0, n-1]
+             * -> random number in range [0,9]
+             * SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
+             */
             val maxStep = SecureRandom().nextInt(10).plus(1)
 
-            // The point inside the picker is identified by its pixels coordinates.
-            // It is computed the center point of the picker (cx1,cy1) using the top left and bottom right pixels bounds extracted from the basicSelector element above.
-            // From the center coords of the picker we add/sub a random number calculated exploiting a random radius (upper-bounded by the radius of the picker) and a random azimuth.
-            // In this way it has been obtained a random point inside the picker to select.
+            /**
+             * The point inside the picker is identified by its pixels coordinates.
+             * It is computed the center point of the picker (cx1,cy1) using the top left
+             * and bottom right pixels bounds extracted from the basicSelector element above.
+             * From the center coords of the picker we add/sub a random number
+             * calculated exploiting a random radius (upper-bounded by the radius of the picker)
+             * and a random azimuth.
+             * In this way it has been obtained a random point inside the picker to select.
+             */
             for (i in 1..maxStep step 1) {
 
                 // Get the randomPair in which to move the cursor inside the picker.
@@ -333,17 +527,41 @@ class EzvizSmartBulb (private val device: UiDevice,
                val steps = 10
 
                 // Drag the cursor to the random point got.
-                device.drag(randomPair.first,randomPair.second,randomPair.first, randomPair.second,steps)
+                device.drag(randomPair.first,
+                    randomPair.second,
+                    randomPair.first,
+                    randomPair.second,steps)
 
                 // Groundtruth log file function writer.
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Edit color temperature randomly]\n")
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                            + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                            + "[APP: ${obj.app.appName}] "
+                            + "[DEVICE TYPE: ${obj.dev.dev}] "
+                            + "[DEVICE MODEL: ${obj.mod}] "
+                            + "[ACTION: Edit color temperature randomly]\n")
 
                 // Set the delay for the current action to be accomplished.
                 setDelay(SmartObjDelay.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
         }
 
         // Get back to the previous View Frame.
@@ -354,15 +572,33 @@ class EzvizSmartBulb (private val device: UiDevice,
     private fun editModes() {
 
         try {
+
             // Open Smart Plug management view.
             openSmartBulb()
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
+
             return
         }
 
         try {
+
             // Get Modes disk Tab center coords.
             val modesBtn = getCenter(
                 SmartObjCoord.EZVIZ_SMARTBULB_MODES_BTN.startP,
@@ -403,17 +639,26 @@ class EzvizSmartBulb (private val device: UiDevice,
                 UiSelector().className(
                     SmartObjClassName.EZVIZ_ANDROID_VIEWGROUP.cn).index(3))
 
-            // It is set arbitrarily a random number betwen 1 and 10 to set the steps of a for loop,
-            // in which it will be selected a button mode among the one present inside the viewgroup,
-            // such that something happens to color hue, temperature, and light mode (fixed, not fixed, light frequency and speed).
-            // SecureRandom().nextInt(10) -> random number in range [0, n-1] -> random number in range [0,9]
-            // SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
+            /**
+             * It is set arbitrarily a random number between 1 and 10 to set the steps of a for loop,
+             * in which it will be selected a button mode
+             * among the one present inside the viewgroup,
+             * such that something happens to color hue, temperature,
+             * and light mode (fixed, not fixed, light frequency and speed).
+             * SecureRandom().nextInt(10) -> random number in range [0, n-1]
+             * -> random number in range [0,9]
+             * SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
+             */
             val maxStep = SecureRandom().nextInt(10).plus(1)
 
             // The mode button is identified by its index defined below by modes var.
             for (i in 1..maxStep step 1) {
-                // Get a randomNumber that identify the index of a mode to select.
-                // SecureRandom().nextInt(8) -> random number in range [0, n-1] -> random number in range [0,7]
+
+                /**
+                 * Get a randomNumber that identify the index of a mode to select.
+                 * SecureRandom().nextInt(8) -> random number in range [0, n-1]
+                 * -> random number in range [0,7]
+                 */
                 val randomNumber = SecureRandom().nextInt(8)
 
                 /*
@@ -450,31 +695,55 @@ class EzvizSmartBulb (private val device: UiDevice,
                         .index(randomNumber)).click()
 
                 // Groundtruth log file function writer.
-                writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Set preset mode $modes]\n")
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                            + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                            + "[APP: ${obj.app.appName}] "
+                            + "[DEVICE TYPE: ${obj.dev.dev}] "
+                            + "[DEVICE MODEL: ${obj.mod}] "
+                            + "[ACTION: Set preset mode ${modes}]\n")
 
                 // Set the delay for the current action to be accomplished.
                 setDelay(SmartObjDelay.DELAY_ACTION.delay)
             }
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
         }
 
         // Get back to the previous View Frame.
         pressBackButton()
     }
 
-    // Method used the get the center pair (x,y) pixels of a 2D figure given:
-    // - startP = starting pair point (x,y) pixels representing top left element bounds.
-    // - endP   = ending pair point (x,y) pixels representing bottom right element bounds.
+    /**
+     * Method used the get the center pair (x,y) pixels of a 2D figure given:
+     * - startP = starting pair point (x,y) pixels representing top left element bounds.
+     * - endP   = ending pair point (x,y) pixels representing bottom right element bounds.
+     */
     private fun getCenter(startP: Pair<Int,Int>, endP: Pair<Int,Int>): Pair<Int,Int> {
 
         // hx identifies half length of the 2D element inspected on x-axis.
-        val hx = (endP.first).minus(startP.first).floorDiv(2) 
+        val hx = (endP.first).minus(startP.first).floorDiv(2)
+
         // hy identifies half length of the 2D element inspected on y-axis.
         val hy = (endP.second).minus(startP.second).floorDiv(2)
 
-        // Center coords are being got by adding the 2 half lenghts to the starting point coords.
+        // Center coords are being got by adding the 2 half lengths to the starting point coords.
         val cenx = (startP.first).plus(hx)
         val ceny = (startP.second).plus(hy)
 
@@ -488,6 +757,7 @@ class EzvizSmartBulb (private val device: UiDevice,
 
         // hx identifies half length of the 2D element inspected on x-axis.
         val hx = (endP.first).minus(startP.first).floorDiv(2)
+
         // hy identifies half length of the 2D element inspected on y-axis.
         val hy = (endP.second).minus(startP.second).floorDiv(2)
 
@@ -500,17 +770,23 @@ class EzvizSmartBulb (private val device: UiDevice,
 
         // Calculate the center coords of the disk considered.
         val cencoords = getCenter(startP, endP)
+
         // Get the radius.
         val rho = getRadius(startP, endP)
 
-        // Get random radius in the range [0,rho]. That is the upper bound value of the radius of our disk.
+        /**
+         * Get random radius in the range [0,rho].
+         * That is the upper bound value of the radius of our disk.
+         */
         val randomRho = SecureRandom().nextInt(rho).plus(1)
 
         // Get random azimuth in the range [0,2*PI]
         val randomTheta = SecureRandom().nextDouble().times(2).times(PI)
 
-        // Get cartesian coords from polar ones.
-        // They represent the random point on which the cursor will be put.
+        /**
+         * Get cartesian coords from polar ones.
+         * They represent the random point on which the cursor will be put.
+         */
         val randomx = randomRho.times(cos(randomTheta)).toInt()
         val randomy = randomRho.times(sin(randomTheta)).toInt()
 
@@ -518,21 +794,28 @@ class EzvizSmartBulb (private val device: UiDevice,
     }
 
     // Method to get a random point (identified by a pair of pixels x,y) inside a semi-disk.
-    private fun getRandomSemiCircleCoords(startP: Pair<Int,Int>, endP: Pair<Int,Int>): Pair<Int,Int> {
+    private fun getRandomSemiCircleCoords(startP: Pair<Int,Int>,
+                                          endP: Pair<Int,Int>): Pair<Int,Int> {
 
         // Calculate the center coords of the disk considered.
         val cencoords = getCenter(startP, endP)
 
-        // Since we have a torus figure, rho is fixed and it is not calculatred with a random value.
-        // Indeed, this is not a complete disk in which we have to select a random point.
-        // The parameters are empirically estimated exploiting UIAutomatorViewer.
+        /**
+         * Since we have a torus figure, rho is fixed and it is not calculated with a random value.
+         * Indeed, this is not a complete disk in which we have to select a random point.
+         * The parameters are empirically estimated exploiting UIAutomatorViewer.
+         */
+
         val rho = getRadius(startP, endP).minus(rhoCursorEstimate.plus(rhoSemiDiskEstimate))
 
         // Get random azimuth in the range [0,2*PI]
         val randomTheta = Random.nextDouble(0.0, PI.times(2))
 
-        // Get cartesian coords from polar ones.
-        // They represent the random point on which the cursor will be put.
+        /**
+         * Get cartesian coords from polar ones.
+         * They represent the random point on which the cursor will be put.
+         */
+
         val randomx = rho.times(cos(randomTheta)).toInt()
         val randomy = rho.times(sin(randomTheta)).toInt()
 
@@ -541,26 +824,35 @@ class EzvizSmartBulb (private val device: UiDevice,
 
     // Method that handles the random feedback popups that appears on current app view.
     private fun checkPopUpFeedback() {
+
         // Check if the popup is on View Frame Layout.
-        if (device.findObject(UiSelector().text(SmartObjTextSelector.EZVIZ_FEEDBACK.textLabel)).exists()) {
+        if (device.hasObject(By.text(SmartObjTextSelector.EZVIZ_FEEDBACK.textLabel))) {
+
             // Closing Popup window.
-            device.findObject(UiSelector().resourceId(SmartObjResourceId.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
+            device.findObject(By.res(SmartObjResourceId.EZVIZ_SMARTHOME_CLOSE_BTN.rid)).click()
         }
     }
 
-    // Method that manages the possible actions executable for the smart device selected randomly.
+    // Method that manages the possible performable actions for the smart device selected randomly.
     fun selectRandomInstrumentedTest() {
 
-        // Error launcher variable
-        // The meaning of the errl return code is explained in the launchSmartApp method.
+        /**
+         * Error launcher variable
+         *
+         * The meaning of the errl return code is explained in the launchSmartApp method.
+         */
         val errl = launchSmartApp()
 
         if (errl == 0) {
+
             // It is checked a possible popup view.
             checkPopUpFeedback()
 
-            // SecureRandom().nextInt(5) -> random number in range [0, n-1] -> random number in range [0,4]
-            // SecureRandom().nextInt(5).plus(1) -> random number in range [1, 5]
+            /**
+             * SecureRandom().nextInt(5) -> random number in range [0, n-1]
+             * -> random number in range [0,4]
+             * SecureRandom().nextInt(5).plus(1) -> random number in range [1, 5]
+             */
             val seed = SecureRandom().nextInt(5).plus(1)
 
             when(seed) {
@@ -573,14 +865,18 @@ class EzvizSmartBulb (private val device: UiDevice,
         }
     }
 
-    // Method that manages the possible actions executable for the smart device run sequentially.
+    // Method that manages the possible performable actions for the smart device run sequentially.
     fun execSeqInstrumentedTest() {
 
-        // Error launcher variable
-        // The meaning of the errl return code is explained in the launchSmartApp method.
+        /**
+         * Error launcher variable
+         *
+         * The meaning of the errl return code is explained in the launchSmartApp method.
+         */
         val errl = launchSmartApp()
 
         if (errl == 0) {
+
             // It is checked a possible popup view.
             checkPopUpFeedback()
 

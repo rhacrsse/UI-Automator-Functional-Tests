@@ -15,7 +15,8 @@ import androidx.test.uiautomator.*
  *     - smart object android app name and smart object android app package name.
  *     - smart object device type.
  *     - smart object device model.
- *   - objState that is the current real state of the smart object. Set it accordingly when instantiating the kotlin object.
+ *   - objState that is the current real state of the smart object.
+ *     Set it accordingly when instantiating the kotlin object.
  */
 class TapoSmartPlug (private val device: UiDevice,
                      private val obj: SmartObjModel = SmartObjModel.P100,
@@ -26,27 +27,44 @@ class TapoSmartPlug (private val device: UiDevice,
         Thread.sleep(delay)
     }
 
-    // Method that opens the Tapo app from the android homescreen view frame.
-    // return errcode -> 0: App opened succesfully.
-    //                -> 2: Error encountered.
+    /**
+     * Method that opens the Tapo app from the android homescreen view frame.
+     * return errcode -> 0: App opened succesfully.
+     *                -> 2: Error encountered.
+     */
     private fun launchSmartApp(): Int {
         try {
 
-            // Get the current package name that identifies the app currently opened on the Android Frame Layout.
+            /**
+             * Get the current package name that identifies the app
+             * currently opened on the Android Frame Layout.
+             */
             val currpkgname = device.currentPackageName
+
             // Value of the Android homescreen view frame package name. 
             val androidpkgname = SmartObjPkg.ANDROID.pkgName
-            // Value of the next package name to be opened. It this is the the package name of Tapo app.
+
+            /**
+             * Value of the next package name to be opened.
+             * If this is the the package name of Tapo app.
+             */
             val nextpkgname = obj.app.pkg.pkgName
 
-            // Get back to homescreen Android Frame Layout if the previous event involved another App.
-            // The 2 following conditions use the package name associated to the App currently opened in the Frame Layout to perform the check.
-            // It is needed to get back to the homescreen Android Frame Layout, in case we are in another App homescreen (CONDITION #2)
-            // rather than the one actually showed.
-            // The App actually opend must be different from Android homescreen Frame Layout (CONDITION #1).
-            // The 1st condition assures that it is not pressed the home button if the view displayed is the Android homescreen one.
-            // The 2nd condition ensures that it is not pressed the home button if the view displayed is already the correct one,
-            // so we are already where we want to be, due to the previous event that has exploited the same App.
+            /**
+             * Get back to homescreen Android Frame Layout
+             * if the previous event involved another App.
+             * The 2 following conditions use the package name associated
+             * to the App currently opened in the Frame Layout to perform the check.
+             * It is needed to get back to the homescreen Android Frame Layout, in case
+             * we are in another App homescreen (condition #2) rather than the one actually showed.
+             * The App actually opened must be different
+             * from Android homescreen Frame Layout (condition #1).
+             * The first condition assures that it is not pressed the home button
+             * if the view displayed is the Android homescreen one.
+             * The second condition ensures that it is not pressed the home button
+             * if the view displayed is already the correct one, so we are already
+             * where we want to be, due to the previous event that has exploited the same App.
+             */
             if (!currpkgname.equals(androidpkgname) && !currpkgname.equals(nextpkgname)) {
                 pressHomeButton()
             }
@@ -54,50 +72,95 @@ class TapoSmartPlug (private val device: UiDevice,
             // Open Tapo App if not yet so.
             if (!currpkgname.equals(nextpkgname)) {
 
-                // Select the Tapo app Icon.
-                val allAppsButton: UiObject = device.findObject(
-                    UiSelector().description(
-                        obj.app.appName))
-
-                // Click the Tapo icon an Open the Tapo app.
-                allAppsButton.clickAndWaitForNewWindow()
+                // Select, Click the and Open the Tapo app.
+                device.findObject(
+                    By.desc(obj.app.appName))
+                    .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
             }
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
+
             return 2
         }
 
         return 0
     }
 
-    // Method that opens the Smart Plug management window frame inside Tapo app.
-    // return code -> 0: Error encountered, no steps done.
-    //             -> 1: Error encountered, but 1 step accomplished. It is needed to step back of 1 view.
-    //             -> 2: All 2 steps accomplished, smart plug view opened succesfully.
+    /**
+     * Method that opens the Smart Bulb management window frame inside Tapo app.
+     * return code -> 0: Error encountered, no steps done.
+     *             -> 1: Error encountered, but 1 step accomplished.
+     *                   It is needed to step back of 1 view.
+     *             -> 2: All 2 steps accomplished, smart plug view opened succesfully.
+     */
     private fun openSmartPlug(): Int {
 
         try {
-            // Open Favourites tab. 
-            device.findObject(
-                UiSelector().text(
-                    SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_ALL.textLabel))
-                .clickAndWaitForNewWindow()
+
+            // Open Favourites tab.
+            device.findObject(By
+                .text(SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_ALL.textLabel))
+                .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
+
             return 0
         }
 
         try {
-            // Open Smart Plug management view
-            device.findObject(
-                UiSelector().text(
-                    SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_PLUGS.textLabel))
-                .clickAndWaitForNewWindow()
+
+            // Open Smart Plug management view.
+            device.findObject(By
+                .text(SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_PLUGS.textLabel))
+                .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
+
             return 1
         }
 
@@ -126,14 +189,33 @@ class TapoSmartPlug (private val device: UiDevice,
     private fun click() {
 
         try {
-            // Control the plug current state and turn it OFF if it is ON, or turn it ON if it is OFF.
+
+            /**
+             * Control the plug current state and turn it OFF if it is ON,
+             * or turn it ON if it is OFF.
+             */
             when(checkPlugStatus()) {
                 true  -> turnOff()
                 false -> turnOn()
             }
         } catch (e: Exception) {
-            // Groundtruth log file function writer.
-            writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: NOP - ${e.message.toString().replace(",", "-")}]\n")
+
+            /**
+             * Groundtruth log file function writer.
+             *
+             * The replace function is used to remove the ',' characters
+             * since afterwards the txt file will be converted to csv.
+             * In this way it will be avoided the ambiguity
+             * with the comma separator elements to be processed by pandas for data analysis.
+             */
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: NOP - ${e.message.toString()
+                    .replace(",", "-")}]\n")
         }
     }
 
@@ -141,13 +223,19 @@ class TapoSmartPlug (private val device: UiDevice,
     private fun turnOn() {
 
         // Click the button element on current view.
-        device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTPLUG_STATE_BTN.rid)).click()
+        device.findObject(By.res(SmartObjResourceId.TAPO_SMARTPLUG_STATE_BTN.rid)).click()
 
         // Change the objState class attribute to ON
         objState = SmartObjState.STATE_ON
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Turn ON plug]\n")
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Turn ON plug]\n")
 
         // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -157,13 +245,19 @@ class TapoSmartPlug (private val device: UiDevice,
     private fun turnOff() {
 
         // Click the button element on current view.
-        device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTPLUG_STATE_BTN.rid)).click()
+        device.findObject(By.res(SmartObjResourceId.TAPO_SMARTPLUG_STATE_BTN.rid)).click()
 
         // Change the objState class attribute to OFF
         objState = SmartObjState.STATE_OFF
 
         // Groundtruth log file function writer.
-        writeGroundTruthFile(gtfile,"[TIMESTAMP: ${getTimestamp()}] [EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] [APP: ${obj.app.appName}] [DEVICE TYPE: ${obj.dev.dev}] [DEVICE MODEL: ${obj.mod}] [ACTION: Turn OFF plug]\n")
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Turn OFF plug]\n")
 
         // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -171,33 +265,48 @@ class TapoSmartPlug (private val device: UiDevice,
 
     // Method that handles the random feedback popups that appears on current app view.
     private fun checkPopUpFeedback() {
-        // Check if the popup is on View Frame Layout
-        if (device.findObject(UiSelector().text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel)).exists()) {
-            // Closing Popup window
-            device.findObject(UiSelector().resourceId(SmartObjResourceId.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
+
+        // Check if the popup is on View Frame Layout.
+        if (device.hasObject(By.text(SmartObjTextSelector.TAPO_FEEDBACK.textLabel))) {
+
+            // Closing Popup window.
+            device.findObject(By.res(SmartObjResourceId.TAPO_SMARTHOME_CLOSE_BTN.rid)).click()
         }
     }
 
-    // Method that manages the possible actions executable for the smart device selected randomly.
-    // In this case the only action is to switch on/off the plug so selectRandomInstrumentedTest end execSeqInstrumentedTest have the identical behaviour.
+    /**
+     * Method that manages the possible performable actions
+     * for the smart device selected randomly.
+     * In this case the only action is to switch on/off the plug,
+     * so selectRandomInstrumentedTest end execSeqInstrumentedTest have the identical behaviour.
+     */
     fun selectRandomInstrumentedTest() {
         execSeqInstrumentedTest()
     }
 
-    // Method that manages the possible actions executable for the smart device run sequentially.
-    // In this case the only action is to switch on/off the plug so selectRandomInstrumentedTest end execSeqInstrumentedTest have the identical behaviour.
+    /**
+     * Method that manages the possible performable actions
+     * for the smart device run sequentially.
+     * In this case the only action is to switch on/off the plug,
+     * so selectRandomInstrumentedTest end execSeqInstrumentedTest have the identical behaviour.
+     */
     fun execSeqInstrumentedTest() {
 
-        // Error launcher variable
-        // The meaning of the errl return code is explained in the launchSmartApp method.
+        /**
+         * Error launcher variable
+         * The meaning of the errl return code is explained in the launchSmartApp method.
+         */
         val errl = launchSmartApp()
 
         if (errl == 0) {
+
             // It is checked a possible popup view.
             checkPopUpFeedback()
 
-            // Step view open smart plug variable
-            // The meaning of the stepv return code is explained in the openSmartBulb method.
+            /**
+             * Step view open smart plug variable
+             * The meaning of the stepv return code is explained in the openSmartBulb method.
+             */
             val stepv = openSmartPlug()
 
             if (stepv == 2) {

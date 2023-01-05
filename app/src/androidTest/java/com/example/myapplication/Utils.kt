@@ -5,8 +5,6 @@ package com.example.myapplication
 import android.os.Environment
 import java.io.File
 import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -137,10 +135,10 @@ enum class SmartObjTextSelector(val textLabel: String) {
 }
 
 // Groundtruth log file name that will be create/updated on the emulated android device storage with the groundtruth events.
-val gtfile = "gtfile.txt"
+const val gtfile = "gtfile.txt"
 
 // Groundtruth log file date format
-val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
 
 // Function in charge of writing the groundtruth events in the log file.
 fun writeGroundTruthFile(sFileName: String, sBody: String){
@@ -152,7 +150,7 @@ fun writeGroundTruthFile(sFileName: String, sBody: String){
             // The Path of the groundtruth log file is /storage/emulated/0/Documents/gtfile.txt .
             val logfile = File(root, sFileName)
             when (logfile.exists()) {
-                // if the file exissts, it will be appended the event.
+                // if the file exists, it will be appended the event.
                 true  -> { logfile.appendText(sBody) }
                 // if the file does not exist, it will be created, and the first event row will be inserted.
                 false -> { logfile.createNewFile(); logfile.writeText(sBody) }
@@ -160,7 +158,7 @@ fun writeGroundTruthFile(sFileName: String, sBody: String){
         }
         catch(e: IOException)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
 }
 
@@ -182,5 +180,5 @@ var rhoSemiDiskEstimate = 75
 // Event counter
 var SMARTOBJ_EVENT_NUMBER = 1
 
-// Max events's number to be processed.
+// Max events' number to be processed.
 var SMARTOBJ_EVENT_ITERS = 1440 // 1440 events are about 24 hours of test running generating 1 event every 60 seconds.
