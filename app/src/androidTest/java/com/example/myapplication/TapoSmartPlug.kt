@@ -72,10 +72,22 @@ class TapoSmartPlug (private val device: UiDevice,
             // Open Tapo App if not yet so.
             if (!currpkgname.equals(nextpkgname)) {
 
+                // It is checked a possible popup view.
+                checkPopUpFeedback()
+
                 // Select, Click the and Open the Tapo app.
                 device.findObject(
                     By.desc(obj.app.appName))
                     .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+                // Groundtruth log file function writer.
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                            + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                            + "[APP: ${obj.app.appName}] "
+                            + "[DEVICE TYPE: ${obj.dev.dev}] "
+                            + "[DEVICE MODEL: ${obj.mod}] "
+                            + "[ACTION: Open Tapo App]\n")
             }
         } catch (e: Exception) {
             /**
@@ -112,10 +124,22 @@ class TapoSmartPlug (private val device: UiDevice,
 
         try {
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             // Open Favourites tab.
             device.findObject(By
                 .text(SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_ALL.textLabel))
                 .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Open favourites tab]\n")
         } catch (e: Exception) {
             /**
              * Groundtruth log file function writer.
@@ -139,10 +163,22 @@ class TapoSmartPlug (private val device: UiDevice,
 
         try {
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             // Open Smart Plug management view.
             device.findObject(By
                 .text(SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_PLUGS.textLabel))
                 .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Open Smart Plug mgmt view]\n")
         } catch (e: Exception) {
             /**
              * Groundtruth log file function writer.
@@ -170,11 +206,29 @@ class TapoSmartPlug (private val device: UiDevice,
     // Method that clicks the back button 
     private fun pressBackButton() {
         device.pressBack()
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Press back button]\n")
     }
 
     // Method that clicks the home button 
     private fun pressHomeButton() {
         device.pressHome()
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Press Home button]\n")
     }
 
     // Method that controls the current state of the smart device
@@ -221,6 +275,8 @@ class TapoSmartPlug (private val device: UiDevice,
 
     // Method that turns on the smart device changing its state to ON.
     private fun turnOn() {
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
 
         // Click the button element on current view.
         device.findObject(By.res(SmartObjResourceId.TAPO_SMARTPLUG_STATE_BTN.rid)).click()
@@ -243,6 +299,8 @@ class TapoSmartPlug (private val device: UiDevice,
 
     // Method that turns off the smart device changing its state to OFF.
     private fun turnOff() {
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
 
         // Click the button element on current view.
         device.findObject(By.res(SmartObjResourceId.TAPO_SMARTPLUG_STATE_BTN.rid)).click()

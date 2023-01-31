@@ -73,10 +73,22 @@ class EzvizSmartPlug (private val device: UiDevice,
             // Open Ezviz App if not yet so.
             if (!currpkgname.equals(nextpkgname)) {
 
+                // It is checked a possible popup view.
+                checkPopUpFeedback()
+
                 // Select the Ezviz app Icon.
                 device.findObject(
                     By.desc(obj.app.appName))
                     .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+                // Groundtruth log file function writer.
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                            + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                            + "[APP: ${obj.app.appName}] "
+                            + "[DEVICE TYPE: ${obj.dev.dev}] "
+                            + "[DEVICE MODEL: ${obj.mod}] "
+                            + "[ACTION: Open EZVIZ App]\n")
             }
         } catch (e: Exception) {
 
@@ -106,9 +118,21 @@ class EzvizSmartPlug (private val device: UiDevice,
     // Method that selects the Smart Bulb management window frame inside Ezviz app.
     private fun selectSmartPlugTab() {
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         // Select Plug Tab.
         device.findObject(By.text(SmartObjTextSelector
             .EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_PLUGS.textLabel)).click()
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Select Smart Plug tab]\n")
 
         // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -117,6 +141,15 @@ class EzvizSmartPlug (private val device: UiDevice,
     // Method that clicks the home button .
     private fun pressHomeButton() {
         device.pressHome()
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Press Home button]\n")
     }
 
     // Method that controls the current state of the smart device.
@@ -189,6 +222,9 @@ class EzvizSmartPlug (private val device: UiDevice,
     // Method that turns on the smart device changing its state to ON.
     private fun turnOn() {
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         // Click the button element on current view.
         device.findObject(By.res(EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
 
@@ -211,8 +247,14 @@ class EzvizSmartPlug (private val device: UiDevice,
     // Method that turns off the smart device changing its state to OFF.
     private fun turnOff() {
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         // Click the button element on current view.
         device.findObject(By.res(EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
+
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
 
         /**
          * When turning off the Plug it will be shown, a popup confirmation frame view.

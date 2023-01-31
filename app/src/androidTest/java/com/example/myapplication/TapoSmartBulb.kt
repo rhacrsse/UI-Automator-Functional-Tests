@@ -77,10 +77,22 @@ class TapoSmartBulb (private val device: UiDevice,
             // Open Tapo App if not yet so.
             if (!currpkgname.equals(nextpkgname)) {
 
+                // It is checked a possible popup view.
+                checkPopUpFeedback()
+
                 // Select, Click the and Open the Tapo app.
                 device.findObject(
                     By.desc(obj.app.appName))
                     .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+                // Groundtruth log file function writer.
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                            + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                            + "[APP: ${obj.app.appName}] "
+                            + "[DEVICE TYPE: ${obj.dev.dev}] "
+                            + "[DEVICE MODEL: ${obj.mod}] "
+                            + "[ACTION: Open Tapo App]\n")
             }
         } catch (e: Exception) {
 
@@ -118,10 +130,22 @@ class TapoSmartBulb (private val device: UiDevice,
 
         try {
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             // Open Favourites tab.
             device.findObject(By
                 .text(SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_ALL.textLabel))
                 .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Open favourites tab]\n")
         } catch (e: Exception) {
 
             /**
@@ -146,10 +170,22 @@ class TapoSmartBulb (private val device: UiDevice,
 
         try {
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             // Open Smart Bulb management view.
             device.findObject(By
                 .text(SmartObjTextSelector.TAPO_SMARTHOME_FAVOURITES_BULBS.textLabel))
                 .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Open Smart Bulb mgmt view]\n")
         } catch (e: Exception) {
             /**
              * Groundtruth log file function writer.
@@ -177,11 +213,29 @@ class TapoSmartBulb (private val device: UiDevice,
     // Method that clicks the back button.
     private fun pressBackButton() {
         device.pressBack()
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Press back button]\n")
     }
 
     // Method that clicks the home button.
     private fun pressHomeButton() {
         device.pressHome()
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Press Home button]\n")
     }
 
     // Method that controls the current state of the smart device.
@@ -229,6 +283,9 @@ class TapoSmartBulb (private val device: UiDevice,
     // Method that turns on the smart device changing its state to ON.
     private fun turnOn() {
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         // Click the button element on current view.
         device.findObject(By.res(SmartObjResourceId.TAPO_SMARTBULB_STATE_BTN.rid)).click()
 
@@ -250,6 +307,9 @@ class TapoSmartBulb (private val device: UiDevice,
 
     // Method that turns off the smart device changing its state to OFF.
     private fun turnOff() {
+
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
 
         // Click the button element on current view.
         device.findObject(By.res(SmartObjResourceId.TAPO_SMARTBULB_STATE_BTN.rid)).click()
@@ -277,6 +337,9 @@ class TapoSmartBulb (private val device: UiDevice,
 
             // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
+
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
 
             /**
              * Select the slider element able to change the brightness.
@@ -330,6 +393,9 @@ class TapoSmartBulb (private val device: UiDevice,
 
             // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
+
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
 
             /**
              * Select the slider element able to change the brightness.
@@ -395,9 +461,21 @@ class TapoSmartBulb (private val device: UiDevice,
              * the default parameters associate to preset color chosen.
              */
             for (i in 1..2) {
+                // It is checked a possible popup view.
+                checkPopUpFeedback()
+
                 device.findObject(By
                     .res(SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
                     .children.elementAt(2).click()
+
+                // Groundtruth log file function writer.
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Click on blu preset color (index 2)]\n")
             }
 
             // Set the delay for the current action to be accomplished.
@@ -426,10 +504,25 @@ class TapoSmartBulb (private val device: UiDevice,
 
         try {
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             // Select the White Light tab that contains the slider.
             device.findObject(By
                 .res(SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_BTN.rid))
                 .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Select White Light tab]\n")
+
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
 
             /**
              * To increase the color temperature we move the slider downwards,
@@ -476,12 +569,24 @@ class TapoSmartBulb (private val device: UiDevice,
                     .replace(",", "-")}]\n")
         }
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         /**
          * Close the customization view of the preset color picked arbitrarily,
          * without saving any changes.
          */
         device.findObject(By.res(SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
             .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Close customization view of the preset color\n")
 
         // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -506,9 +611,21 @@ class TapoSmartBulb (private val device: UiDevice,
              * the default parameters associate to preset color chosen.
              */
             for (i in 1..2) {
+                // It is checked a possible popup view.
+                checkPopUpFeedback()
+
                 device.findObject(By
                     .res(SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
                     .children.elementAt(2).click()
+
+                // Groundtruth log file function writer.
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Click on blu preset color (index 2)]\n")
             }
 
             // Set the delay for the current action to be accomplished.
@@ -537,10 +654,25 @@ class TapoSmartBulb (private val device: UiDevice,
 
         try {
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             // Select the White Light tab that contains the slider.
             device.findObject(By
                 .res(SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_WHITE_LIGHT_BTN.rid))
                 .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Select White Light tab]\n")
+
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
 
             /**
              * To decrease the color temperature we move the slider upwards,
@@ -587,12 +719,24 @@ class TapoSmartBulb (private val device: UiDevice,
                     .replace(",", "-")}]\n")
         }
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         /**
          * Close the customization view of the preset color picked arbitrarily,
          * without saving any changes.
          */
         device.findObject(By.res(SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
             .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Close customization view of the preset color\n")
 
         // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -616,9 +760,21 @@ class TapoSmartBulb (private val device: UiDevice,
              * the default parameters associate to preset color chosen.
              */
             for (i in 1..2) {
+                // It is checked a possible popup view.
+                checkPopUpFeedback()
+
                 device.findObject(By
                     .res(SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
                     .children.elementAt(2).click()
+
+                // Groundtruth log file function writer.
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Click on blu preset color (index 2)]\n")
             }
 
             // Set the delay for the current action to be accomplished.
@@ -647,10 +803,22 @@ class TapoSmartBulb (private val device: UiDevice,
 
         try {
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             // Select the Color Light tab that contains the slider.
             device.findObject(By
                 .res(SmartObjResourceId.TAPO_SMARTBULB_EDIT_PRESET_COLOR_LIGHT_BTN.rid))
                 .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Select Color Light tab]\n")
 
             /**
              * It is set arbitrarily a random number between 1 and 10
@@ -661,6 +829,9 @@ class TapoSmartBulb (private val device: UiDevice,
              * SecureRandom().nextInt(10).plus(1) -> random number in range [1, 10]
              */
             val maxStep = SecureRandom().nextInt(10).plus(1)
+
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
 
             // Select the disk color picker element using its resource identifier.
             val basicSelector = device.findObject(By
@@ -724,12 +895,24 @@ class TapoSmartBulb (private val device: UiDevice,
                     .replace(",", "-")}]\n")
         }
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         /**
          * Close the customization view of the preset color picked arbitrarily,
          * without saving any changes.
          */
         device.findObject(By.res(SmartObjResourceId.TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
             .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Close customization view of the preset color\n")
 
         // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -849,6 +1032,9 @@ class TapoSmartBulb (private val device: UiDevice,
                     else -> randomNumber.minus(2)
                 }
 
+                // It is checked a possible popup view.
+                checkPopUpFeedback()
+
                 /**
                  * Select the viewgroup element that includes the 7 preset colors.
                  * Click the preset color button.
@@ -856,6 +1042,16 @@ class TapoSmartBulb (private val device: UiDevice,
                 device.findObject(By
                     .res(SmartObjResourceId.TAPO_SMARTBULB_PRESET_COLORS.rid))
                     .children[idx].click()
+
+                // Groundtruth log file function writer.
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                            + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                            + "[APP: ${obj.app.appName}] "
+                            + "[DEVICE TYPE: ${obj.dev.dev}] "
+                            + "[DEVICE MODEL: ${obj.mod}] "
+                            + "[ACTION: Select viewgroup element with index ${idx} "
+                            + "of preset color ${presetColor}\n")
 
                 // Set the delay for the current action to be accomplished.
                 setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -870,6 +1066,9 @@ class TapoSmartBulb (private val device: UiDevice,
                  * based on the randomNumber value.
                  */
                 try {
+                    // It is checked a possible popup view.
+                    checkPopUpFeedback()
+
                     when(randomNumber) {
                         // AUTO-COMPENSATE MODE
                         1 -> {
@@ -894,6 +1093,9 @@ class TapoSmartBulb (private val device: UiDevice,
                                 + "[DEVICE MODEL: ${obj.mod}] "
                                 + "[ACTION: Set preset color ${presetColor}]\n")
                 } catch (e: Exception) {
+                    // It is checked a possible popup view.
+                    checkPopUpFeedback()
+
                     device.findObject(By.res(SmartObjResourceId.
                     TAPO_SMARTBULB_EDIT_CLOSE_BTN.rid))
                         .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
@@ -947,10 +1149,22 @@ class TapoSmartBulb (private val device: UiDevice,
             // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             // Click Theme button in the smart bulb view to access the Theme View.
             device.findObject(By
                 .res(SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
                 .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Click Theme button view]\n")
         } catch (e: Exception) {
             /**
              * Groundtruth log file function writer.
@@ -973,6 +1187,9 @@ class TapoSmartBulb (private val device: UiDevice,
         }
 
         try {
+
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
 
             // Click Mode Direct - Party button.
             device.findObject(By
@@ -990,6 +1207,9 @@ class TapoSmartBulb (private val device: UiDevice,
 
             setDelay(SmartObjDelay.DELAY_WINDOW.delay)
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             /**
              * Stop Mode Direct - Party
              * after a number of seconds set by the previous setDelay(...) method.
@@ -997,6 +1217,15 @@ class TapoSmartBulb (private val device: UiDevice,
             device.findObject(By
                 .res(SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid))
                 .click()
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Stop party theme]\n")
 
             // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -1020,10 +1249,22 @@ class TapoSmartBulb (private val device: UiDevice,
                     .replace(",", "-")}]\n")
         }
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         // Exit from the Theme View.
         device.findObject(By
             .res(SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
             .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Exit from Theme view]\n")
     }
 
     // Method that activates the BREATH - RELAX theme preset mode.
@@ -1033,9 +1274,21 @@ class TapoSmartBulb (private val device: UiDevice,
             // Switch ON the bulb if it is OFF.
             if (!checkBulbStatus()) turnOn()
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             // Click Theme button in the smart bulb view to access the Theme View.
             device.findObject(By
                 .res(SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Click Theme button view]\n")
         } catch (e: Exception) {
 
             /**
@@ -1059,6 +1312,10 @@ class TapoSmartBulb (private val device: UiDevice,
         }
 
         try {
+
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             // Click Mode Breath - Relax button.
             device.findObject(By
                 .res(SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BREATH_RELAX_BTN.rid))
@@ -1075,6 +1332,9 @@ class TapoSmartBulb (private val device: UiDevice,
 
             setDelay(SmartObjDelay.DELAY_WINDOW.delay)
 
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
+
             /**
              * Stop Mode Breath - Relax
              * after a number of seconds set by the previous setDelay(...) method.
@@ -1082,6 +1342,15 @@ class TapoSmartBulb (private val device: UiDevice,
             device.findObject(By
                 .res(SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_EXIT_BTN.rid))
                 .click()
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Stop relax theme]\n")
 
             // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -1105,10 +1374,22 @@ class TapoSmartBulb (private val device: UiDevice,
                     .replace(",", "-")}]\n")
         }
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         // Exit from the Theme View.
         device.findObject(By
             .res(SmartObjResourceId.TAPO_SMARTBULB_THEME_MODE_BTN.rid))
             .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Exit from Theme view]\n")
     }
 
     /**

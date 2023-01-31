@@ -75,10 +75,22 @@ class EzvizSmartBulb (private val device: UiDevice,
             // Open Ezviz App if not yet so.
             if (!currpkgname.equals(nextpkgname)) {
 
+                // It is checked a possible popup view.
+                checkPopUpFeedback()
+
                 // Select the Ezviz app Icon.
                 device.findObject(
                     By.desc(obj.app.appName))
                     .clickAndWait(Until.newWindow(),SmartObjDelay.DELAY_WINDOW.delay)
+
+                // Groundtruth log file function writer.
+                writeGroundTruthFile(gtfile,
+                    "[TIMESTAMP: ${getTimestamp()}] "
+                            + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                            + "[APP: ${obj.app.appName}] "
+                            + "[DEVICE TYPE: ${obj.dev.dev}] "
+                            + "[DEVICE MODEL: ${obj.mod}] "
+                            + "[ACTION: Open EZVIZ App]\n")
             }
         } catch (e: Exception) {
 
@@ -108,9 +120,21 @@ class EzvizSmartBulb (private val device: UiDevice,
     // Method that selects the Smart Bulb management window frame inside Ezviz app.
     private fun selectSmartBulbTab() {
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         // Select Bulb Tab.
         device.findObject(By.text(SmartObjTextSelector
             .EZVIZ_SMARTHOME_GROUP_TAB_LAYOUT_BULBS.textLabel)).click()
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Select Smart Bulb tab]\n")
 
         // Set the delay for the current action to be accomplished.
         setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -125,20 +149,50 @@ class EzvizSmartBulb (private val device: UiDevice,
         // Switch on the bulb if it is off.
         if (!checkBulbStatus()) { turnOn() }
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         // Click on the Bulb button to open to bulb main layout.
         device.findObject(By
             .res(SmartObjResourceId.EZVIZ_SMARTHOME_MAIN_LAYOUT.rid))
             .clickAndWait(Until.newWindow(), SmartObjDelay.DELAY_WINDOW.delay)
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Open Smart Bulb mgmt view]\n")
     }
 
     // Method that clicks the back button.
     private fun pressBackButton() {
         device.pressBack()
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Press back button]\n")
     }
 
     // Method that clicks the home button.
     private fun pressHomeButton() {
         device.pressHome()
+
+        // Groundtruth log file function writer.
+        writeGroundTruthFile(gtfile,
+            "[TIMESTAMP: ${getTimestamp()}] "
+                    + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                    + "[APP: ${obj.app.appName}] "
+                    + "[DEVICE TYPE: ${obj.dev.dev}] "
+                    + "[DEVICE MODEL: ${obj.mod}] "
+                    + "[ACTION: Press Home button]\n")
     }
 
     // Method that controls the current state of the smart device.
@@ -212,6 +266,9 @@ class EzvizSmartBulb (private val device: UiDevice,
     // Method that turns on the smart device changing its state to ON.
     private fun turnOn() {
 
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
+
         // Click the button element on current view.
         device.findObject(By.res(SmartObjResourceId.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
 
@@ -233,6 +290,9 @@ class EzvizSmartBulb (private val device: UiDevice,
 
     // Method that turns off the smart device changing its state to OFF.
     private fun turnOff() {
+
+        // It is checked a possible popup view.
+        checkPopUpFeedback()
 
         // Click the button element on current view.
         device.findObject(By.res(SmartObjResourceId.EZVIZ_SMARTHOME_STATE_BTN.rid)).click()
@@ -308,6 +368,9 @@ class EzvizSmartBulb (private val device: UiDevice,
 
             // Random Value for x coord.
             val casualMove = Random.nextInt(leftx,rightx)
+
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
 
             // Drag cursor along the slider changing Bulb brightness.
             device.findObject(By
@@ -385,6 +448,15 @@ class EzvizSmartBulb (private val device: UiDevice,
 
             // Click and Select Color Hue customization View Frame.
             device.click(colorBtn.first, colorBtn.second)
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Click and Select Color Hue customization view frame]\n")
 
             // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -493,6 +565,15 @@ class EzvizSmartBulb (private val device: UiDevice,
 
             // Click and Select Color Temperature customization View Frame.
             device.click(colorTemperatureBtn.first,colorTemperatureBtn.second)
+
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Click and Select Color Temperatur customization view frame]\n")
 
             // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
@@ -607,8 +688,21 @@ class EzvizSmartBulb (private val device: UiDevice,
             // Click and Select Modes Button Temperature customization View Frame.
             device.click(modesBtn.first,modesBtn.second)
 
+            // Groundtruth log file function writer.
+            writeGroundTruthFile(gtfile,
+                "[TIMESTAMP: ${getTimestamp()}] "
+                        + "[EVENT COUNTER: ${SMARTOBJ_EVENT_NUMBER}] "
+                        + "[APP: ${obj.app.appName}] "
+                        + "[DEVICE TYPE: ${obj.dev.dev}] "
+                        + "[DEVICE MODEL: ${obj.mod}] "
+                        + "[ACTION: Click and Select Modes Button Temperature "
+                        + "customization view frame]\n")
+
             // Set the delay for the current action to be accomplished.
             setDelay(SmartObjDelay.DELAY_ACTION.delay)
+
+            // It is checked a possible popup view.
+            checkPopUpFeedback()
 
             // Select the ViewGroup UI Element containing all the modes personalized buttons.
             val baseBtn = device.findObject(
