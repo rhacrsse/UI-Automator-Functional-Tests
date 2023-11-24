@@ -1,1 +1,1 @@
-# UI Automator Funciontal Tests for AutomIoT
+# UI Automator Functional Tests for AutomIoT
